@@ -1,0 +1,161 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: #f6fef9;
+  color: #333;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #00a884;
+  color: white;
+  padding: 15px 20px;
+}
+
+.logo {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.btn-volver {
+  background-color: white;
+  color: #00a884;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-volver:hover {
+  background-color: #e8f8f3;
+}
+
+/* Contenido principal */
+.detalle-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* Producto */
+.producto {
+  display: flex;
+  flex-wrap: wrap;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.producto-img {
+  flex: 1 1 400px;
+  width: 100%;
+  height: auto;
+}
+
+.producto-info {
+  flex: 1 1 300px;
+  padding: 20px;
+}
+
+.producto-titulo {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+}
+
+.producto-precio {
+  color: #008060;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.producto-descripcion {
+  margin: 15px 0;
+  line-height: 1.5;
+}
+
+.btn-comprar {
+  background-color: #00a884;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.btn-comprar:hover {
+  background-color: #008f73;
+}
+
+/* Vendedor */
+.vendedor {
+  margin-top: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.vendedor-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.vendedor-img {
+  border-radius: 50%;
+}
+
+.mapa {
+  margin-top: 15px;
+}
+
+.mapa img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* Reseñas */
+.reseñas {
+  margin-top: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.reseña {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+
+.reseña:last-child {
+  border-bottom: none;
+}
+
+.reseña-nombre {
+  font-weight: bold;
+  color: #008060;
+  margin-bottom: 5px;
+}
+
+/* Footer */
+.footer {
+  background-color: #00a884;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  margin-top: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .producto {
+    flex-direction: column;
+  }
+}

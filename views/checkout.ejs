@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyShop - Checkout</title>
+  <link rel="stylesheet" href="../css/checkout.css" />
+</head>
+<body> 
+  <header class="header">
+    <h1 class="logo">MyShop</h1>
+    <nav>
+      <a href="/gallery" class="btn-volver">← Volver al catálogo</a>
+    </nav>
+  </header>
+
+  <main class="checkout-container">
+    <h2>Finalizar compra</h2>
+
+    <form class="checkout-form">
+      <section class="form-section">
+        <h3>Datos de envío</h3>
+        <label>Nombre completo</label>
+        <input type="text" placeholder="Juan Pérez" required />
+
+        <label>Dirección</label>
+        <input type="text" placeholder="Calle Ejemplo 123" required />
+
+        <label>Ciudad</label>
+        <input type="text" placeholder="Madrid" required />
+
+        <label>Código Postal</label>
+        <input type="text" placeholder="28001" required />
+      </section>
+
+      <section class="form-section">
+        <h3>Método de pago</h3>
+        <label><input type="radio" name="pago" checked /> Tarjeta de crédito</label>
+        <label><input type="radio" name="pago" /> PayPal</label>
+        <label><input type="radio" name="pago" /> Transferencia bancaria</label>
+
+        <div class="tarjeta-info">
+          <label>Número de tarjeta</label>
+          <input type="text" placeholder="1234 5678 9012 3456" />
+
+          <label>Fecha de expiración</label>
+          <input type="text" placeholder="MM/AA" />
+
+          <label>CVV</label>
+          <input type="text" placeholder="123" />
+        </div>
+      </section>
+
+      <button type="button" class="btn-pagar" onclick="mostrarConfirmacion()">Realizar pago</button>
+    </form>
+
+    <div id="mensaje-confirmacion" class="confirmacion-oculta">
+      <h3>✅ Operación realizada correctamente</h3>
+      <p>Gracias por tu compra. Recibirás un correo con los detalles de tu pedido.</p>
+      <a href="/" class="btn-volver">Volver al catálogo</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 MyShop - Todos los derechos reservados</p>
+  </footer>
+
+  <script>
+    function mostrarConfirmacion() {
+      document.querySelector('.checkout-form').style.display = 'none';
+      document.getElementById('mensaje-confirmacion').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

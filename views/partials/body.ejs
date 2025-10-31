@@ -1,0 +1,59 @@
+<div class="layout">
+    <button class="toggle-filtros">🧩 Mostrar filtros</button>
+
+    <aside class="filtros">
+
+        <h3>Filtros</h3>
+
+        <div class="filtro">
+            <label for="nombre">Nombre producto:</label>
+            <input id="nombreProducto" name="nombre" list="productos" placeholder="Nombre del producto">
+            <datalist id="productos"></datalist>
+        </div>
+
+        <div class="filtro">
+            <label for="precio">Mínimo precio (€):</label>
+            <div class="precio-rango">
+                <div><input id="pi_input" type="range" min="0" max="100" step="1" value="0" /></div>
+                <div><output id="value"></output> €</div>
+            </div>
+        </div>
+
+        <div class="filtro">
+            <label>Valoración mínima:</label>
+            <div class="stars-filter">
+                <!-- ⭐  ☆ -->
+                <label data-value="1"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
+                <label data-value="2"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
+                <label data-value="3"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
+                <label data-value="4"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
+                <label data-value="5"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
+            </div>
+            <p id="resultado"></p>
+        </div>
+
+        <div class="filtro">
+            <label>Categoría:</label>
+            <div class="categoria">
+                <select name="select-categoria" id="option-category">
+                    <option value="" selected>Todos los productos</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Tecnologia">Tecnología</option>
+                    <option value="Cultura">Cultura</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Deporte">Deporte</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filtro">
+            <button class="btn-filtrar">Aplicar filtros</button>
+        </div>
+    </aside>
+
+    <main class="catalogo" id="catalogo"></main>
+
+</div>
+
+<script src="../js/gallery.js" defer></script>

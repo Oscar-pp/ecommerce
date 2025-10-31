@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyShop - Panel del Vendedor</title>
+  <link rel="stylesheet" href="../css/dashboard.css" />
+</head>
+<body>
+  <header class="header">
+    <h1 class="logo">MyShop | Panel del Vendedor</h1>
+    <nav>
+      <a href="/" class="btn-salir">← Salir</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-container">
+    <section class="resumen">
+      <div class="card-resumen">
+        <h3>🛒 Productos activos</h3>
+        <p class="valor">12</p>
+      </div>
+      <div class="card-resumen">
+        <h3>💰 Ventas realizadas</h3>
+        <p class="valor">48</p>
+      </div>
+      <div class="card-resumen">
+        <h3>⭐ Valoración media</h3>
+        <p class="valor">4.6 / 5</p>
+      </div>
+      <div class="card-resumen">
+        <h3>💬 Opiniones recibidas</h3>
+        <p class="valor">27</p>
+      </div>
+    </section>
+
+    <section class="productos">
+      <div class="productos-header">
+        <h2>Mis productos</h2>
+        <button class="btn-agregar" id="abrirModal">+ Añadir producto</button>
+      </div>
+
+      <table class="tabla-productos">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><img src="https://via.placeholder.com/80" alt="Producto" /></td>
+            <td>Camiseta verde básica</td>
+            <td>19,99 €</td>
+            <td>Activo</td>
+            <td><button class="btn-editar">Editar</button> <button class="btn-eliminar">Eliminar</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- 🟢 Modal para añadir producto -->
+  <div id="modalAgregar" class="modal">
+    <div class="modal-contenido">
+      <span class="cerrar" id="cerrarModal">&times;</span>
+      <h2>Añadir nuevo producto</h2>
+      <form class="form-modal">
+        <label>Nombre del producto</label>
+        <input type="text" placeholder="Ej: Camiseta ecológica" required />
+
+        <label>Categoría</label>
+        <input type="text" placeholder="Ej: Ropa" required />
+
+        <label>Precio (€)</label>
+        <input type="number" step="0.01" placeholder="19.99" required />
+
+        <label>Descripción</label>
+        <textarea rows="3" placeholder="Breve descripción del producto..." required></textarea>
+
+        <label>Imagen</label>
+        <input type="file" accept="image/*" />
+
+        <button type="button" class="btn-guardar" onclick="guardarProducto()">Guardar producto</button>
+      </form>
+
+      <p id="mensajeExito" class="mensaje-exito">✅ Producto guardado correctamente</p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 MyShop - Panel del vendedor</p>
+  </footer>
+
+  <script src="../js/modal_producto.js" defer></script>
+</body>
+</html>
