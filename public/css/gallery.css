@@ -154,7 +154,41 @@
 /* ============================================================
    🔹 RANGO DE PRECIO
    ============================================================ */
-.precio-rango {
+.filtro-precio {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.precio-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.precio-inputs input[type="number"] {
+  width: 90px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.precio-inputs input[type="number"]:focus {
+  outline: none;
+  border-color: var(--color-primary, #00a884);
+  box-shadow: 0 0 4px rgba(0, 168, 132, 0.3);
+}
+
+.error-msg {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  display: none;
+}
+
+/* .precio-rango {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -172,7 +206,7 @@
   flex: 1;
   accent-color: var(--color-primary);
   cursor: pointer;
-}
+} */
 
 /* ============================================================
    🔹 ESTRELLAS

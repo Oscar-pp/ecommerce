@@ -12,24 +12,45 @@
         </div>
 
         <div class="filtro">
-            <label for="precio">Mínimo precio (€):</label>
-            <div class="precio-rango">
-                <div><input id="pi_input" type="range" min="0" max="100" step="1" value="0" /></div>
-                <div><output id="value"></output> €</div>
+            <div class="filtro-precio">
+                <label>Rango de precio (€):</label>
+                <div class="precio-inputs">
+                    <input type="number" id="precio-min" min="0" max="10000" step="10" value="0" placeholder="Mín">
+                    <span>—</span>
+                    <input type="number" id="precio-max" min="0" max="10000" step="10" value="10000" placeholder="Máx">
+                </div>
+                <small id="error-precio" class="error-msg"></small>
             </div>
         </div>
 
         <div class="filtro">
-            <label>Valoración mínima:</label>
-            <div class="stars-filter">
-                <!-- ⭐  ☆ -->
-                <label data-value="1"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
-                <label data-value="2"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
-                <label data-value="3"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
-                <label data-value="4"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
-                <label data-value="5"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></label>
-            </div>
-            <p id="resultado"></p>
+            <fieldset>
+                <legend>Valoración mínima:</legend>
+                <div class="stars-filter">
+                    <!-- ⭐  ☆ -->
+                    <label data-value="1"><svg viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg></label>
+                    <label data-value="2"><svg viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg></label>
+                    <label data-value="3"><svg viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg></label>
+                    <label data-value="4"><svg viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg></label>
+                    <label data-value="5"><svg viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg></label>
+                </div>
+                <p id="resultado"></p>
+            </fieldset>
         </div>
 
         <div class="filtro">

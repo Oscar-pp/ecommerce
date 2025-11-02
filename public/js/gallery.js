@@ -12,13 +12,16 @@ Gallery.js
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.querySelector(".toggle-filtros");
   const filtros = document.querySelector(".filtros");
-  const input = document.getElementById("pi_input");
-  const currentPrice = document.getElementById("value");
+  // const input = document.getElementById("pi_input");
+  const inputMin = document.getElementById("precio-min");
+  const inputMax = document.getElementById("precio-max");
+  const errorMsg = document.getElementById("error-precio");
+  // const currentPrice = document.getElementById("value");
   const stars = document.querySelectorAll(".stars-filter label");
   const btnFiltrar = document.querySelector(".btn-filtrar");
   const inputNombre = document.getElementById("nombreProducto");
   const datalist = document.getElementById("productos");
-  const catalogo = document.querySelector(".catalogo"); 
+  const catalogo = document.querySelector(".catalogo");
   const categoria = document.getElementById("option-category");
 
   let currentValue = 0; // Valor actual de estrellas
@@ -26,7 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Objeto que guarda todos los filtros activos
   const filtrosActivos = {
     estrellas: 0,
-    precio: input.value,
+    precioMin: inputMin.value,
+    precioMax: inputMax.value,
     nombreProducto: "",
     categoria: categoria.value,
   };
@@ -50,7 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const texto = inputNombre.value.trim();
     if (texto.length === 0) return;
 
-    const response = await fetch(`/api/productos?search=${encodeURIComponent(texto)}`);
+    const response = await fetch(
+      `/api/productos?search=${encodeURIComponent(texto)}`
+    );
     const nombres = await response.json();
     datalist.innerHTML = "";
 
@@ -64,60 +70,72 @@ document.addEventListener("DOMContentLoaded", () => {
   /* -------------------------------
      RANGE DE PRECIO
   --------------------------------*/
-  currentPrice.textContent = input.value;
-  input.addEventListener("input", () => {
-    currentPrice.textContent = input.value;
-    filtrosActivos.precio = input.value;
-  });
+  function validarRango() {
+    const min = parseFloat(inputMin.value) || 0;
+    const max = parseFloat(inputMax.value) || 0;
+
+    if (min > max) {
+      errorMsg.textContent =
+        "⚠️ El precio mínimo no puede ser mayor que el máximo.";
+      errorMsg.style.display = "block";
+      return false;
+    } else {
+      errorMsg.style.display = "none";
+      filtrosActivos.precioMin = min;
+      filtrosActivos.precioMax = max;
+      return true;
+    }
+  }
+
+  // Valida solo cuando el usuario termina de editar
+  inputMin.addEventListener("blur", validarRango);
+  inputMax.addEventListener("blur", validarRango);
 
   /* -------------------------------
      STARS FILTRO
   --------------------------------*/
   stars.forEach((star) => {
-  star.addEventListener("mouseenter", () => {
-    const value = parseInt(star.getAttribute("data-value"));
-    stars.forEach((s) => {
-      if (parseInt(s.getAttribute("data-value")) <= value) {
-        s.classList.add("active");
+    star.addEventListener("mouseenter", () => {
+      const value = parseInt(star.getAttribute("data-value"));
+      stars.forEach((s) => {
+        if (parseInt(s.getAttribute("data-value")) <= value) {
+          s.classList.add("active");
+        } else {
+          s.classList.remove("active");
+        }
+      });
+    });
+
+    star.addEventListener("mouseleave", () => {
+      stars.forEach((s) => {
+        if (parseInt(s.getAttribute("data-value")) <= currentValue) {
+          s.classList.add("active");
+        } else {
+          s.classList.remove("active");
+        }
+      });
+    });
+
+    star.addEventListener("click", () => {
+      const value = parseInt(star.getAttribute("data-value"));
+
+      if (value === currentValue) {
+        currentValue = 0;
+        filtrosActivos.estrellas = 0;
       } else {
-        s.classList.remove("active");
+        currentValue = value;
+        filtrosActivos.estrellas = value;
       }
+
+      stars.forEach((s) => {
+        if (parseInt(s.getAttribute("data-value")) <= currentValue) {
+          s.classList.add("active");
+        } else {
+          s.classList.remove("active");
+        }
+      });
     });
   });
-
-  star.addEventListener("mouseleave", () => {
-    stars.forEach((s) => {
-      if (parseInt(s.getAttribute("data-value")) <= currentValue) {
-        s.classList.add("active");
-      } else {
-        s.classList.remove("active");
-      }
-    });
-  });
-
-  star.addEventListener("click", () => {
-    const value = parseInt(star.getAttribute("data-value"));
-
-    if (value === currentValue) {
-      currentValue = 0;
-      filtrosActivos.estrellas = 0;
-    } else {
-      currentValue = value;
-      filtrosActivos.estrellas = value;
-    }
-
-    stars.forEach((s) => {
-      if (parseInt(s.getAttribute("data-value")) <= currentValue) {
-        s.classList.add("active");
-      } else {
-        s.classList.remove("active");
-      }
-    });
-  });
-});
-
-
-
 
   /* -------------------------------
      FUNCIÓN PARA RENDERIZAR PRODUCTOS
@@ -135,13 +153,17 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "product-card";
       card.innerHTML = `
         <a href="/detail">
-          <img src="${p.imagen_url}" alt="${p.descripcion}" class="product-img" />
+          <img src="${p.imagen_url}" alt="${
+        p.descripcion
+      }" class="product-img" />
         </a>
         <div class="product-info">
           <a href="/detail"><h2 class="product-title">${p.nombre}</h2></a>
           <p class="product-price">${p.precio} €</p>
           <div class="product-rating">
-            ${[1, 2, 3, 4, 5].map(i => i <= p.star_product ? "⭐" : "☆").join("")}
+            ${[1, 2, 3, 4, 5]
+              .map((i) => (i <= p.star_product ? "⭐" : "☆"))
+              .join("")}
           </div>
           <button class="btn-add">Añadir al carrito</button>
         </div>
@@ -164,6 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
      BOTÓN FILTRAR (sin recargar)
   --------------------------------*/
   btnFiltrar.addEventListener("click", async () => {
+    if (!validarRango()) return; // evita aplicar si los valores del rango estan mal.
     filtrosActivos.nombreProducto = inputNombre.value.trim();
     filtrosActivos.categoria = categoria.value;
     await cargarProductos();
