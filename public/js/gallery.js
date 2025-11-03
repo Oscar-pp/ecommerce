@@ -12,11 +12,9 @@ Gallery.js
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.querySelector(".toggle-filtros");
   const filtros = document.querySelector(".filtros");
-  // const input = document.getElementById("pi_input");
   const inputMin = document.getElementById("precio-min");
   const inputMax = document.getElementById("precio-max");
   const errorMsg = document.getElementById("error-precio");
-  // const currentPrice = document.getElementById("value");
   const stars = document.querySelectorAll(".stars-filter label");
   const btnFiltrar = document.querySelector(".btn-filtrar");
   const inputNombre = document.getElementById("nombreProducto");
@@ -152,18 +150,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("section");
       card.className = "product-card";
       card.innerHTML = `
-        <a href="/detail">
-          <img src="${p.imagen_url}" alt="${
-        p.descripcion
-      }" class="product-img" />
+        <a href="/detail/${p.id_producto}">
+          <img src="images/${p.imagen_url}" loading="lazy" alt="${p.descripcion}" class="product-img" />
         </a>
         <div class="product-info">
-          <a href="/detail"><h2 class="product-title">${p.nombre}</h2></a>
+          <a href="/detail/${p.id_producto}">
+            <h2 class="product-title">${p.nombre}</h2>
+          </a>
           <p class="product-price">${p.precio} €</p>
           <div class="product-rating">
-            ${[1, 2, 3, 4, 5]
-              .map((i) => (i <= p.star_product ? "⭐" : "☆"))
-              .join("")}
+            ${[1, 2, 3, 4, 5].map((i) => (i <= p.star_product ? "⭐" : "☆")).join("")}
           </div>
           <button class="btn-add">Añadir al carrito</button>
         </div>

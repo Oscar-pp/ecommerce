@@ -1,0 +1,36 @@
+<main>
+  <div class="detalle-producto-container">
+    <div class="detalle-producto">
+      <div class="producto-imagen">
+        <img src="/images/<%= producto.imagen_url %>" alt="<%= producto.nombre %>">
+      </div>
+
+      <div class="producto-info">
+        <h2 class="producto-titulo"><%= producto.nombre %></h2>
+        <p class="producto-precio"><%= Number(producto.precio).toFixed(2) %> €</p>
+        <p class="producto-descripcion"><%= producto.descripcion %></p>
+        <p class="producto-categoria">Categoría: <%= producto.categoria %></p>
+        <p class="producto-stock">Disponibles: <%= producto.cantidad_disponible %></p>
+
+        <div class="acciones">
+          <button class="btn-comprar">🛒 Añadir al carrito</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🌍 Mapa de ubicación -->
+    <div class="mapa-container">
+      <h3>📍 Ubicación del vendedor: <%= producto.nombre_vendedor %></h3>
+      <div id="map"
+           data-latitud="<%= producto.lat_vendedor %>"
+           data-longitud="<%= producto.lon_vendedor %>"
+           data-nombre="<%= producto.nombre_vendedor %>">
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet CSS y JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/detail.js"></script>
+</main>

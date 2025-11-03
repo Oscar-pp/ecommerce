@@ -42,9 +42,49 @@ app.get("/", async (req, res, next) => {
     res.render("index", {
       titulo: "MyShop - Plataforma de E-commerce",
       mensaje: "¡Bienvenido a MyShop!",
+      filecss: "../css/gallery.css",
+      zonaMain: "body",
     });
   } catch (error) {
     next(error);
+  }
+});
+
+app.get("/detail/:id_producto", async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+    console.log("ID recibido:", req.params.id_producto);
+    // Obtenemos los productos y la ubicacion del vendedor
+    const [rows] = await pool.query(
+      `SELECT p.*, 
+          v.nombre_tienda AS nombre_vendedor, 
+          v.latitud AS lat_vendedor, 
+          v.longitud AS lon_vendedor
+        FROM productos p
+        LEFT JOIN vendedores v ON p.id_vendedor = v.id_vendedor
+        WHERE p.id_producto = ?`,
+            [id_producto]
+        );
+
+    console.log("Resultado SQL:", rows);
+    // Si no hay resultados
+    if (!rows || rows.length === 0) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    // Obtenemos el producto (primer resultado)
+    const producto = rows[0];
+
+    // Renderizamos la vista
+    res.render("index", {
+      titulo: `Detalle de ${producto.nombre}`,
+      zonaMain: "detail",
+      filecss: "/css/detail.css",
+      producto,
+    });
+  } catch (error) {
+    console.error("Error al cargar el detalle:", error);
+    res.status(500).send("Error al cargar los datos del producto");
   }
 });
 
@@ -58,26 +98,17 @@ app.get("/checkout", async (req, res) => {
   }
 });
 
-app.get("/detail", async (req, res) => {
-  try {
-    const [productos] = await pool.query("SELECT * FROM Productos");
-    res.render("producto_detalle", { productos });
-  } catch (error) {
-    console.error("Error al consultar la base de datos:", error);
-    res.status(500).send("Error al cargar los productos");
-  }
-});
-
-app.get("/gallery", async (req, res) => {
-  try {
-    res.render("cliente_catalogo", {
-      titulo: "Cliente",
-    });
-  } catch (error) {
-    console.error("Error al consultar la base de datos:", error);
-    res.status(500).send("Error al cargar los productos");
-  }
-});
+// app.get("/gallery", async (req, res) => {
+//   try {
+//     res.render("index", {
+//       titulo: "Cliente",
+//       zonaMain: "body"
+//     });
+//   } catch (error) {
+//     console.error("Error al consultar la base de datos:", error);
+//     res.status(500).send("Error al cargar los productos");
+//   }
+// });
 
 app.get("/dashboard", async (req, res) => {
   try {
