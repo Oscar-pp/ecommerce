@@ -151,7 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "product-card";
       card.innerHTML = `
         <a href="/detail/${p.id_producto}">
-          <img src="images/${p.imagen_url}" loading="lazy" alt="${p.descripcion}" class="product-img" />
+          <img src="images/${p.imagen_url}" loading="lazy" alt="${
+        p.descripcion
+      }" class="product-img" />
         </a>
         <div class="product-info">
           <a href="/detail/${p.id_producto}">
@@ -159,14 +161,22 @@ document.addEventListener("DOMContentLoaded", () => {
           </a>
           <p class="product-price">${p.precio} €</p>
           <div class="product-rating">
-            ${[1, 2, 3, 4, 5].map((i) => (i <= p.star_product ? "⭐" : "☆")).join("")}
+            ${[1, 2, 3, 4, 5]
+              .map((i) => (i <= p.star_product ? "⭐" : "☆"))
+              .join("")}
           </div>
-          <button class="btn-add">Añadir al carrito</button>
+          <button class="btn-add" data-id="${p.id_producto}">Añadir al carrito</button>
         </div>
       `;
       catalogo.appendChild(card);
+
+      // Añadir funcionalidad al botón "Añadir al carrito"
+      const btnAdd = card.querySelector(".btn-add");
+      btnAdd.addEventListener("click", () => {
+        alert("Producto añadido al carrito: " + btnAdd.dataset.id);
+      });
     });
-  }
+  };
 
   /* -------------------------------
      FUNCIÓN PARA CARGAR PRODUCTOS
