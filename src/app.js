@@ -172,6 +172,24 @@ app.get("/api/filtrarValores", async (req, res) => {
   }
 });
 
+app.get("/api/productos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = `SELECT * FROM productos WHERE id_producto = ?`;
+    const values = [id];
+    const [rows] = await pool.query(query, values);
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
 /* 
     ZONA FINAL, Errores, Listener Server
 */
