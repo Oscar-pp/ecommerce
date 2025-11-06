@@ -24,43 +24,7 @@ ACCESIBILIDAD:
 - Mensajes de error y estados visuales
 */
 
-/* -------------------------------
-   FUNCIONES PARA GESTIONAR CARRITO
---------------------------------*/
-function addToCart(productId) {
-  const cart = getCart();
-  if (!cart.includes(productId)) {
-    cart.push(productId);
-    localStorage.setItem("cart_items", JSON.stringify(cart));
-  }
-  return cart;
-}
-
-function removeFromCart(productId) {
-  let cart = getCart();
-  cart = cart.filter(id => id !== productId);
-  localStorage.setItem("cart_items", JSON.stringify(cart));
-  return cart;
-}
-
-function getCart() {
-  const cart = localStorage.getItem("cart_items");
-  return cart ? JSON.parse(cart) : [];
-}
-
-function isInCart(productId) {
-  const cart = getCart();
-  return cart.includes(productId);
-}
-
-function updateCartCounter() {
-  const productosCarrito = document.getElementById("cartCount");
-  if (productosCarrito) {
-    const count = getCart().length;
-    productosCarrito.textContent = count;
-    productosCarrito.style.display = count > 0 ? "inline-block" : "none";
-  }
-}
+import { addToCart, isInCart, updateCartCounter, removeFromCart, getCart } from "./cart.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.querySelector(".toggle-filtros");

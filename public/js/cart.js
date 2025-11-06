@@ -3,7 +3,6 @@
   const btn = document.getElementById("cartButton");
   const dropdown = document.getElementById("cartDropdown");
   const cartItemsContainer = dropdown.querySelector(".cart-items");
-  const cart = document.getElementById("cart");
 
   // Maneja apertura/cierre visual y aria
   function setExpanded(val) {
@@ -82,3 +81,156 @@
   // Iniciar cerrado
   setExpanded(false);
 })();
+
+/* -------------------------------
+   RENDERIZADO DEL CARRITO
+--------------------------------*/
+document.addEventListener("DOMContentLoaded", () => {
+  const cartBody = document.getElementById("cartBody");
+  const totalPriceEl = document.getElementById("totalPrice");
+
+  async function renderCart() {
+    const cart = getCart();
+    if (cart.length === 0) {
+      cartBody.innerHTML = `<tr><td colspan="5">Tu carrito está vacío.</td></tr>`;
+      return;
+    }
+
+    // 🔹 Una sola llamada al backend con todos los IDs
+    const res = await fetch(`/api/allProductos?ids=${cart.join(",")}`);
+    const productos = await res.json();
+
+    cartBody.innerHTML = "";
+    let total = 0;
+
+    console.log(productos);
+    productos.forEach((producto) => {
+      const quantity = 1; // o guarda la cantidad en localStorage
+      const precio = parseFloat(producto.precio);
+      const subtotal = precio * quantity;
+      const cantidad_disponible = parseInt(producto.cantidad_disponible);
+      total += subtotal;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `<td><img src="/images/${
+        producto.imagen_producto
+      }" width="50"></td>
+                    <td>${producto.nombre_producto}</td>
+                    <td class="cell-price">${precio.toFixed(2)} €</td>
+                    <td>${cantidad_disponible}</td>
+                    <td><input type="number" min="1" max="${cantidad_disponible}" value="${quantity}" data-id="${
+        producto.id_producto
+      }" class="qty-input"></td>
+                    <td class="cell-subtotal">${subtotal.toFixed(2)} €</td>
+                    <td><button class="remove-btn" data-id="${
+                      producto.id_producto
+                    }">❌</button></td>
+                    `;
+
+      cartBody.appendChild(row);
+    });
+
+    totalPriceEl.textContent = `Total: ${total.toFixed(2)} €`;
+  }
+
+  // Evento: cambio de cantidad
+  // cartBody.addEventListener("input", (e) => {
+  // if (e.target.classList.contains("qty-input")) {
+  //     const productId = parseInt(e.target.dataset.id);
+  //     const newQty = parseInt(e.target.value);
+  //     updateQuantity(productId, newQty);
+  //     renderCart();
+  //   }
+  // });
+
+  // Evento: cambio de cantidad
+  cartBody.addEventListener("input", (e) => {
+    if (e.target.classList.contains("qty-input")) {
+      const input = e.target;
+      const row = input.closest("tr");
+      // const priceEl = row.children[2]; // columna del precio
+      // const subtotalEl = row.children[4]; // columna del subtotal
+
+      const priceEl = row.querySelector(".cell-price");
+      const subtotalEl = row.querySelector(".cell-subtotal");
+
+      const price = parseFloat(priceEl.textContent.replace("€", "").trim());
+      const quantity = parseInt(input.value) || 1;
+
+      // recalcular subtotal de esta fila
+      const newSubtotal = price * quantity;
+      subtotalEl.textContent = `${newSubtotal.toFixed(2)} €`;
+
+      // recalcular total general
+      let total = 0;
+      document.querySelectorAll("#cartBody tr").forEach((tr) => {
+        const subCell = tr.querySelector(".cell-subtotal");
+        if (subCell) {
+          const subText = subCell.textContent.replace("€", "").trim();
+          const subValue = parseFloat(subText);
+          if (!isNaN(subValue)) total += subValue;
+        }
+      });
+
+      totalPriceEl.textContent = `Total: ${total.toFixed(2)} €`;
+    }
+  });
+
+  // Evento: eliminar producto
+  cartBody.addEventListener("click", (e) => {
+    if (e.target.classList.contains("remove-btn")) {
+      const productId = parseInt(e.target.dataset.id);
+      removeFromCart(productId);
+      renderCart();
+    }
+  });
+
+  renderCart();
+});
+
+/* -------------------------------
+   FUNCIONES PARA GESTIONAR CARRITO
+--------------------------------*/
+export function addToCart(productId) {
+  const cart = getCart();
+  if (!cart.includes(productId)) {
+    cart.push(productId);
+    localStorage.setItem("cart_items", JSON.stringify(cart));
+  }
+  return cart;
+}
+
+export function removeFromCart(productId) {
+  let cart = getCart();
+  cart = cart.filter((id) => id !== productId);
+  localStorage.setItem("cart_items", JSON.stringify(cart));
+  return cart;
+}
+
+export function getCart() {
+  const cart = localStorage.getItem("cart_items");
+  return cart ? JSON.parse(cart) : [];
+}
+
+export function isInCart(productId) {
+  const cart = getCart();
+  return cart.includes(productId);
+}
+
+export function updateCartCounter() {
+  const productosCarrito = document.getElementById("cartCount");
+  if (productosCarrito) {
+    const count = getCart().length;
+    productosCarrito.textContent = count;
+    productosCarrito.style.display = count > 0 ? "inline-block" : "none";
+  }
+}
+
+export function updateQuantity(productId, newQty) {
+  const cart = getCart();
+  const item = cart.find((i) => i.id === productId);
+  if (item) {
+    item.quantity = Math.max(1, newQty);
+  }
+  saveCart(cart);
+}

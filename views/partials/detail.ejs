@@ -13,7 +13,7 @@
         <p class="producto-stock">Disponibles: <%= producto.cantidad_disponible %></p>
 
         <div class="acciones">
-          <button class="btn-comprar">🛒 Añadir al carrito</button>
+          <button class="btn-addcart" data-product-id="<%= producto.id_producto %>">🛒 Añadir al carrito</button>
         </div>
       </div>
     </div>
@@ -32,5 +32,5 @@
   <!-- Leaflet CSS y JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/js/detail.js"></script>
+  <script type="module" src="/js/detail.js"></script>
 </main>

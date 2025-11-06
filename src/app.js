@@ -63,8 +63,8 @@ app.get("/detail/:id_producto", async (req, res) => {
         FROM productos p
         LEFT JOIN vendedores v ON p.id_vendedor = v.id_vendedor
         WHERE p.id_producto = ?`,
-            [id_producto]
-        );
+      [id_producto]
+    );
 
     console.log("Resultado SQL:", rows);
     // Si no hay resultados
@@ -88,6 +88,20 @@ app.get("/detail/:id_producto", async (req, res) => {
   }
 });
 
+app.get("/cart", async (req, res) => {
+  try {    
+    // Renderizamos la vista
+    res.render("index", {
+      titulo: `Carrito compras`,
+      zonaMain: "cart",
+      filecss: "/css/cart.css",
+    });
+  } catch (error) {
+    console.error("Error al cargar el detalle:", error);
+    res.status(500).send("Error al cargar los datos del producto");
+  }
+});
+
 app.get("/checkout", async (req, res) => {
   try {
     const [productos] = await pool.query("SELECT * FROM Productos");
@@ -97,18 +111,6 @@ app.get("/checkout", async (req, res) => {
     res.status(500).send("Error realizar el checkout");
   }
 });
-
-// app.get("/gallery", async (req, res) => {
-//   try {
-//     res.render("index", {
-//       titulo: "Cliente",
-//       zonaMain: "body"
-//     });
-//   } catch (error) {
-//     console.error("Error al consultar la base de datos:", error);
-//     res.status(500).send("Error al cargar los productos");
-//   }
-// });
 
 app.get("/dashboard", async (req, res) => {
   try {
@@ -120,6 +122,8 @@ app.get("/dashboard", async (req, res) => {
     res.status(500).send("Error al cargar dashboard");
   }
 });
+
+
 
 /*
     API 
@@ -137,6 +141,50 @@ app.get("/api/productos", async (req, res) => {
     res.json(rows.map((row) => row.nombre));
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+app.get("/api/allProductos", async (req, res) => {
+  try {
+    const ids = req.query.ids;
+    console.log(ids);
+    if (!ids) {
+      return res.status(400).json({ error: "Faltan IDs de productos" });
+    };
+
+    const idArray = ids.split(",").map(Number);
+    console.log(idArray);
+    const [productos] = await pool.query(`SELECT 
+                                            p.id_producto,
+                                            p.nombre AS nombre_producto,
+                                            p.descripcion,
+                                            p.precio,
+                                            p.cantidad_disponible,
+                                            p.categoria,
+                                            p.imagen_url AS imagen_producto,
+                                            p.star_product,
+                                            v.id_vendedor,
+                                            v.nombre_tienda,
+                                            v.direccion_tienda,
+                                            v.latitud,
+                                            v.longitud,
+                                            v.reputacion
+                                          FROM productos p
+                                          INNER JOIN vendedores v ON p.id_vendedor = v.id_vendedor
+                                          WHERE p.id_producto IN (?)
+                                        `, [idArray]);
+
+      console.log(productos);
+
+    if (!productos.length) {
+      return res.status(404).json({ error: "No se encontraron productos" });
+    }
+
+    res.json(productos);
+    
+  } catch (error) {
+    console.error("❌ Error en /api/allProductos:", error);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
@@ -189,6 +237,12 @@ app.get("/api/productos/:id", async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
+
+
+
+
+
+
 
 /* 
     ZONA FINAL, Errores, Listener Server

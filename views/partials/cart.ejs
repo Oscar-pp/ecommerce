@@ -1,0 +1,56 @@
+<!-- <main class="cartTable">
+  <h1>🛒 Tu carrito</h1>
+
+  <table id="cartTable">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Producto</th>
+        <th>Precio</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="cartBody"></tbody>
+  </table>
+
+  <h2 id="totalPrice"></h2>
+
+  <div class="cart-actions">
+    <a href="/checkout" class="checkout-button">Proceder al pago</a>
+  </div>
+</main> -->
+
+<main class="cartTable">
+    <div>
+        <h1>🛒 Tu carrito</h1>
+    </div>
+
+    <div class="cart-content">
+        <div class="cart-items">
+            <table id="cartTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="cartBody"></tbody>
+            </table>
+        </div>
+
+        <div class="cart-summary">
+            <h2>Total:</h2>
+            <div class="total" id="totalPrice">0.00 €</div>
+            <a href="/checkout" class="checkout-button">Proceder al pago</a>
+        </div>
+    </div>
+</main>
+
+<script type="module" src="/js/cart.js" defer></script>
