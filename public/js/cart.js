@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function renderCart() {
     const cart = getCart();
     if (cart.length === 0) {
-      cartBody.innerHTML = `<tr><td colspan="5">Tu carrito está vacío.</td></tr>`;
+      cartBody.innerHTML = `<tr><td colspan="6">Tu carrito está vacío.</td></tr>`;
       return;
     }
 
@@ -105,20 +105,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log(productos);
     productos.forEach((producto) => {
-      const quantity = 1; // o guarda la cantidad en localStorage
+      const quantity = 1;
       const precio = parseFloat(producto.precio);
       const subtotal = precio * quantity;
       const cantidad_disponible = parseInt(producto.cantidad_disponible);
       total += subtotal;
 
       const row = document.createElement("tr");
+      row.setAttribute("data-stock", producto.cantidad_disponible);
       row.innerHTML = `<td><img src="/images/${
         producto.imagen_producto
       }" width="50"></td>
                     <td>${producto.nombre_producto}</td>
                     <td class="cell-price">${precio.toFixed(2)} €</td>
                     <td>${cantidad_disponible}</td>
-                    <td><input type="number" min="1" max="${cantidad_disponible}" value="${quantity}" data-id="${
+                    <td><input type="number" min="1" max="${cantidad_disponible}" step="1" value="${quantity}" data-id="${
         producto.id_producto
       }" class="qty-input"></td>
                     <td class="cell-subtotal">${subtotal.toFixed(2)} €</td>
@@ -130,32 +131,33 @@ document.addEventListener("DOMContentLoaded", () => {
       cartBody.appendChild(row);
     });
 
-    totalPriceEl.textContent = `Total: ${total.toFixed(2)} €`;
+    totalPriceEl.textContent = `${total.toFixed(2)} €`;
   }
-
-  // Evento: cambio de cantidad
-  // cartBody.addEventListener("input", (e) => {
-  // if (e.target.classList.contains("qty-input")) {
-  //     const productId = parseInt(e.target.dataset.id);
-  //     const newQty = parseInt(e.target.value);
-  //     updateQuantity(productId, newQty);
-  //     renderCart();
-  //   }
-  // });
 
   // Evento: cambio de cantidad
   cartBody.addEventListener("input", (e) => {
     if (e.target.classList.contains("qty-input")) {
       const input = e.target;
       const row = input.closest("tr");
-      // const priceEl = row.children[2]; // columna del precio
-      // const subtotalEl = row.children[4]; // columna del subtotal
+      const maxStock = parseInt(row.dataset.stock);
 
       const priceEl = row.querySelector(".cell-price");
       const subtotalEl = row.querySelector(".cell-subtotal");
 
       const price = parseFloat(priceEl.textContent.replace("€", "").trim());
-      const quantity = parseInt(input.value) || 1;
+      let quantity = parseInt(input.value) || 1;
+
+      // Aseguramos número entero
+      quantity = Math.floor(quantity);
+
+      // Limitar cantidad al stock disponible
+      if (quantity > maxStock) {
+        quantity = maxStock;
+      } else if (quantity < 1) {
+        quantity = 1;
+      }
+
+      input.value = quantity;
 
       // recalcular subtotal de esta fila
       const newSubtotal = price * quantity;
@@ -172,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      totalPriceEl.textContent = `Total: ${total.toFixed(2)} €`;
+      totalPriceEl.textContent = `${total.toFixed(2)} €`;
     }
   });
 
