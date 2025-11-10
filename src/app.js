@@ -104,8 +104,11 @@ app.get("/cart", async (req, res) => {
 
 app.get("/checkout", async (req, res) => {
   try {
-    const [productos] = await pool.query("SELECT * FROM Productos");
-    res.render("checkout", { productos });
+    res.render("index", { 
+      titulo: `Realizar pago`,
+      zonaMain: "checkout",
+      filecss: "/css/checkout.css", 
+    });
   } catch (error) {
     console.error("Error al consultar la base de datos:", error);
     res.status(500).send("Error realizar el checkout");
