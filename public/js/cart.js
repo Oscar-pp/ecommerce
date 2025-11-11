@@ -89,105 +89,108 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartBody = document.getElementById("cartBody");
   const totalPriceEl = document.getElementById("totalPrice");
 
-  async function renderCart() {
-    const cart = getCart();
-    if (cart.length === 0) {
-      cartBody.innerHTML = `<tr><td colspan="6">Tu carrito está vacío.</td></tr>`;
-      return;
-    }
+  if (cartBody && totalPriceEl) {
+    async function renderCart() {
+      const cart = getCart();
+      if (cart.length === 0) {
+        cartBody.innerHTML = `<tr><td colspan="6">Tu carrito está vacío.</td></tr>`;
+        return;
+      }
 
-    // 🔹 Una sola llamada al backend con todos los IDs
-    const res = await fetch(`/api/allProductos?ids=${cart.join(",")}`);
-    const productos = await res.json();
+      // 🔹 Una sola llamada al backend con todos los IDs
+      const res = await fetch(`/api/allProductos?ids=${cart.join(",")}`);
+      const productos = await res.json();
 
-    cartBody.innerHTML = "";
-    let total = 0;
+      cartBody.innerHTML = "";
+      let total = 0;
 
-    console.log(productos);
-    productos.forEach((producto) => {
-      const quantity = 1;
-      const precio = parseFloat(producto.precio);
-      const subtotal = precio * quantity;
-      const cantidad_disponible = parseInt(producto.cantidad_disponible);
-      total += subtotal;
+      console.log(productos);
+      productos.forEach((producto) => {
+        const quantity = 1;
+        const precio = parseFloat(producto.precio);
+        const subtotal = precio * quantity;
+        const cantidad_disponible = parseInt(producto.cantidad_disponible);
+        total += subtotal;
 
-      const row = document.createElement("tr");
-      row.setAttribute("data-stock", producto.cantidad_disponible);
-      row.innerHTML = `<td><img src="/images/${
-        producto.imagen_producto
-      }" width="50"></td>
+        const row = document.createElement("tr");
+        row.setAttribute("data-stock", producto.cantidad_disponible);
+        row.innerHTML = `<td><img src="/images/${
+          producto.imagen_producto
+        }" width="50"></td>
                     <td>${producto.nombre_producto}</td>
                     <td class="cell-price">${precio.toFixed(2)} €</td>
                     <td>${cantidad_disponible}</td>
                     <td><input type="number" min="1" max="${cantidad_disponible}" step="1" value="${quantity}" data-id="${
-        producto.id_producto
-      }" class="qty-input"></td>
+          producto.id_producto
+        }" class="qty-input"></td>
                     <td class="cell-subtotal">${subtotal.toFixed(2)} €</td>
                     <td><button class="remove-btn" data-id="${
                       producto.id_producto
                     }">❌</button></td>
                     `;
 
-      cartBody.appendChild(row);
-    });
-
-    totalPriceEl.textContent = `${total.toFixed(2)} €`;
-  }
-
-  // Evento: cambio de cantidad
-  cartBody.addEventListener("input", (e) => {
-    if (e.target.classList.contains("qty-input")) {
-      const input = e.target;
-      const row = input.closest("tr");
-      const maxStock = parseInt(row.dataset.stock);
-
-      const priceEl = row.querySelector(".cell-price");
-      const subtotalEl = row.querySelector(".cell-subtotal");
-
-      const price = parseFloat(priceEl.textContent.replace("€", "").trim());
-      let quantity = parseInt(input.value) || 1;
-
-      // Aseguramos número entero
-      quantity = Math.floor(quantity);
-
-      // Limitar cantidad al stock disponible
-      if (quantity > maxStock) {
-        quantity = maxStock;
-      } else if (quantity < 1) {
-        quantity = 1;
-      }
-
-      input.value = quantity;
-
-      // recalcular subtotal de esta fila
-      const newSubtotal = price * quantity;
-      subtotalEl.textContent = `${newSubtotal.toFixed(2)} €`;
-
-      // recalcular total general
-      let total = 0;
-      document.querySelectorAll("#cartBody tr").forEach((tr) => {
-        const subCell = tr.querySelector(".cell-subtotal");
-        if (subCell) {
-          const subText = subCell.textContent.replace("€", "").trim();
-          const subValue = parseFloat(subText);
-          if (!isNaN(subValue)) total += subValue;
-        }
+        cartBody.appendChild(row);
       });
 
       totalPriceEl.textContent = `${total.toFixed(2)} €`;
     }
-  });
 
-  // Evento: eliminar producto
-  cartBody.addEventListener("click", (e) => {
-    if (e.target.classList.contains("remove-btn")) {
-      const productId = parseInt(e.target.dataset.id);
-      removeFromCart(productId);
-      renderCart();
-    }
-  });
+    // Evento: cambio de cantidad
+    cartBody.addEventListener("input", (e) => {
+      if (e.target.classList.contains("qty-input")) {
+        const input = e.target;
+        const row = input.closest("tr");
+        const maxStock = parseInt(row.dataset.stock);
 
-  renderCart();
+        const priceEl = row.querySelector(".cell-price");
+        const subtotalEl = row.querySelector(".cell-subtotal");
+
+        const price = parseFloat(priceEl.textContent.replace("€", "").trim());
+        let quantity = parseInt(input.value) || 1;
+
+        // Aseguramos número entero
+        quantity = Math.floor(quantity);
+
+        // Limitar cantidad al stock disponible
+        if (quantity > maxStock) {
+          quantity = maxStock;
+        } else if (quantity < 1) {
+          quantity = 1;
+        }
+
+        input.value = quantity;
+
+        // recalcular subtotal de esta fila
+        const newSubtotal = price * quantity;
+        subtotalEl.textContent = `${newSubtotal.toFixed(2)} €`;
+
+        // recalcular total general
+        let total = 0;
+        document.querySelectorAll("#cartBody tr").forEach((tr) => {
+          const subCell = tr.querySelector(".cell-subtotal");
+          if (subCell) {
+            const subText = subCell.textContent.replace("€", "").trim();
+            const subValue = parseFloat(subText);
+            if (!isNaN(subValue)) total += subValue;
+          }
+        });
+
+        totalPriceEl.textContent = `${total.toFixed(2)} €`;
+      }
+    });
+
+    // Evento: eliminar producto
+    cartBody.addEventListener("click", (e) => {
+      if (e.target.classList.contains("remove-btn")) {
+        const productId = parseInt(e.target.dataset.id);
+        removeFromCart(productId);
+        renderCart();
+        updateCartCounter();
+      }
+    });
+
+    renderCart();
+  } // cierre if cartBody y totalPriceEl
 });
 
 /* -------------------------------
@@ -221,10 +224,33 @@ export function isInCart(productId) {
 
 export function updateCartCounter() {
   const productosCarrito = document.getElementById("cartCount");
-  if (productosCarrito) {
-    const count = getCart().length;
-    productosCarrito.textContent = count;
-    productosCarrito.style.display = count > 0 ? "inline-block" : "none";
+  const goToCartLink = document.getElementById("goToCartBtn");
+
+  if (!productosCarrito || !goToCartLink) return; // Si falta alguno, salimos
+
+  const count = getCart().length;
+
+  // Actualizamos el contador visual
+  productosCarrito.textContent = count;
+  productosCarrito.style.display = count > 0 ? "inline-block" : "none";
+
+  // Actualizamos el estado del botón
+  if (count === 0) {
+    goToCartLink.classList.add("disabled");
+    goToCartLink.classList.remove("btn-primary");
+  } else {
+    goToCartLink.classList.remove("disabled");
+    goToCartLink.classList.add("btn-primary");
+  }
+
+  // Evitamos navegación si el enlace está desactivado (solo agregamos el listener una vez)
+  if (!goToCartLink.dataset.listenerAdded) {
+    goToCartLink.addEventListener("click", (e) => {
+      if (goToCartLink.classList.contains("disabled")) {
+        e.preventDefault(); // Evita la navegación
+      }
+    });
+    goToCartLink.dataset.listenerAdded = "true"; // Marcamos que ya tiene el listener
   }
 }
 
