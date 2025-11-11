@@ -94,6 +94,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const cart = getCart();
       if (cart.length === 0) {
         cartBody.innerHTML = `<tr><td colspan="6">Tu carrito está vacío.</td></tr>`;
+        totalPriceEl.textContent = "0.00 €";
+
+        // Disable botón pagar si el carrito está vacío
+        const checkoutBtn = document.getElementById("checkout-button");
+        if (checkoutBtn) {
+          checkoutBtn.classList.add("disabled");
+        } else {
+          checkoutBtn.classList.remove("disabled");
+        }
         return;
       }
 

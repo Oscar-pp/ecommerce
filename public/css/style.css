@@ -270,11 +270,11 @@ main {
 
 #goToCartBtn.btn.disabled {
   pointer-events: none;
-  opacity: 0.6;
+  /* opacity: 0.6; */
   cursor: not-allowed;
   background-color: #f50b0b;
   border: 1px solid #ccc;
-  color: #999;
+  color: #000000;
 }
 
 /* Search bar */

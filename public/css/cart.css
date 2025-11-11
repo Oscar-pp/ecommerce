@@ -157,6 +157,13 @@
   transform: translateY(-2px);
 }
 
+.cart-summary.checkout-button.disabled {
+  pointer-events: none;
+  background-color: #000000;
+  color: #fd0000;
+  cursor: not-allowed;
+} 
+
 
 
 /* ===============================
