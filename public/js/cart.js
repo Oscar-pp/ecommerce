@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
           checkoutBtn.classList.remove("disabled");
         }
         return;
-      }
+      } 
 
       // 🔹 Una sola llamada al backend con todos los IDs
       const res = await fetch(`/api/allProductos?ids=${cart.join(",")}`);
