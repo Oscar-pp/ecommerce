@@ -59,6 +59,8 @@
           removeFromCart(product.id_producto);
           card.remove();
           updateCartCounter();
+
+          
         });
       } catch (error) {
         console.error("Error al cargar el producto:", error);
@@ -86,6 +88,13 @@
    RENDERIZADO DEL CARRITO
 --------------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Ocultao icono del carrito en la página del carrito
+  if (window.location.pathname.includes("/cart")) {
+    const cart = document.querySelector(".header-actions #cart");
+    if (cart) cart.style.display = "none";
+  }
+
   const cartBody = document.getElementById("cartBody");
   const totalPriceEl = document.getElementById("totalPrice");
 
@@ -104,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
           checkoutBtn.classList.remove("disabled");
         }
         return;
-      } 
+      }
 
       // 🔹 Una sola llamada al backend con todos los IDs
       const res = await fetch(`/api/allProductos?ids=${cart.join(",")}`);
@@ -113,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
       cartBody.innerHTML = "";
       let total = 0;
 
-      console.log(productos);
       productos.forEach((producto) => {
         const quantity = 1;
         const precio = parseFloat(producto.precio);
@@ -200,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderCart();
   } // cierre if cartBody y totalPriceEl
+
 });
 
 /* -------------------------------
