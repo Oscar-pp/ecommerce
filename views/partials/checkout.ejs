@@ -2,19 +2,36 @@
   <h1>Finalizar compra</h1>
 
   <form id="payCart" class="checkout-form">
-
     <!-- 🧍 Datos personales -->
     <fieldset class="form-group">
       <legend>Datos personales</legend>
 
       <label for="nombre">Nombre</label>
-      <input type="text" id="nombre" data-field="nombre" placeholder="Juan" required>
+      <input
+        type="text"
+        id="nombre"
+        data-field="nombre"
+        placeholder="Juan"
+        required
+      />
 
       <label for="apellidos">Apellidos</label>
-      <input type="text" id="apellidos" data-field="apellidos" placeholder="Pérez Fernández" required>
+      <input
+        type="text"
+        id="apellidos"
+        data-field="apellidos"
+        placeholder="Pérez Fernández"
+        required
+      />
 
       <label for="telefono">Teléfono</label>
-      <input type="tel" id="telefono" data-field="telefono" placeholder="666111333" pattern="[0-9]{9}">
+      <input
+        type="tel"
+        id="telefono"
+        data-field="telefono"
+        placeholder="666111333"
+        pattern="[0-9]{9}"
+      />
     </fieldset>
 
     <!-- 🏠 Dirección -->
@@ -22,13 +39,32 @@
       <legend>Dirección de envío</legend>
 
       <label for="direccion">Dirección</label>
-      <input type="text" id="direccion" data-field="direccion" placeholder="Calle Ejemplo 123" required>
+      <input
+        type="text"
+        id="direccion"
+        data-field="direccion"
+        placeholder="Calle Ejemplo 123"
+        required
+      />
 
       <label for="ciudad">Ciudad</label>
-      <input type="text" id="ciudad" data-field="ciudad" placeholder="Madrid" required>
+      <input
+        type="text"
+        id="ciudad"
+        data-field="ciudad"
+        placeholder="Madrid"
+        required
+      />
 
       <label for="cp">Código Postal</label>
-      <input type="text" id="cp" data-field="cp" placeholder="28001" required pattern="\d{5}">
+      <input
+        type="text"
+        id="cp"
+        data-field="cp"
+        placeholder="28001"
+        required
+        pattern="\d{5}"
+      />
     </fieldset>
 
     <!-- 📧 Acceso -->
@@ -36,10 +72,21 @@
       <legend>Acceso</legend>
 
       <label for="email">Email</label>
-      <input type="email" id="email" data-field="email" placeholder="ejemplo@email.com" required>
+      <input
+        type="email"
+        id="email"
+        data-field="email"
+        placeholder="ejemplo@email.com"
+        required
+      />
 
       <label for="contrasenya">Contraseña</label>
-      <input type="password" id="contrasenya" data-field="contrasenya" placeholder="Contraseña">
+      <input
+        type="password"
+        id="contrasenya"
+        data-field="contrasenya"
+        placeholder="Contraseña"
+      />
     </fieldset>
 
     <!-- 💳 Pago -->
@@ -47,41 +94,65 @@
       <legend>Método de pago</legend>
 
       <div class="metodos-pago">
-        <label><input type="radio" name="pago" value="tarjeta-info" checked> Tarjeta de crédito</label>
-        <label><input type="radio" name="pago" value="paypal"> PayPal</label>
-        <label><input type="radio" name="pago" value="efectivo-info">Efectivo en tienda</label>
+        <label
+          ><input type="radio" name="pago" value="tarjeta-info" checked />
+          Tarjeta de crédito</label
+        >
+        <label><input type="radio" name="pago" value="paypal" /> PayPal</label>
+        <label
+          ><input type="radio" name="pago" value="efectivo-info" />Efectivo en
+          tienda</label
+        >
       </div>
 
       <div class="tarjeta-info">
         <label for="tarjeta-numero">Número de tarjeta</label>
-        <input type="text" id="tarjeta-numero" data-field="tarjeta_numero" placeholder="1234 5678 9012 3456" >
+        <input
+          type="text"
+          id="tarjeta-numero"
+          data-field="tarjeta_numero"
+          placeholder="1234 5678 9012 3456"
+        />
 
         <label for="tarjeta-fecha">Fecha de expiración</label>
-        <input type="text" id="tarjeta-fecha" data-field="tarjeta_fecha" placeholder="MM/AA" >
+        <input
+          type="text"
+          id="tarjeta-fecha"
+          data-field="tarjeta_fecha"
+          placeholder="MM/AA"
+        />
 
         <label for="tarjeta-cvv">CVV</label>
-        <input type="text" id="tarjeta-cvv" data-field="tarjeta_cvv" placeholder="123" >
+        <input
+          type="text"
+          id="tarjeta-cvv"
+          data-field="tarjeta_cvv"
+          placeholder="123"
+        />
       </div>
 
       <div class="paypal">
         <label for="paypal-email">Email de PayPal</label>
-        <input type="text" id="paypal-email" data-field="paypal-email" >
+        <input type="text" id="paypal-email" data-field="paypal-email" />
       </div>
 
       <div class="efectivo-info">
         <p>Paga en tienda al recoger tu pedido.</p>
       </div>
-
     </fieldset>
+
+    <div class="total-pagar">
+      Total a pagar: <span id="totalPriceCheckout">0.00 €</span>
+    </div>
 
     <button type="button" class="btn-pagar">💳 Realizar pago</button>
   </form>
 
-  <div>Total a pagar: <span id="totalPriceCheckout">0.00 €</span></div>
-
   <div id="mensaje-confirmacion" class="confirmacion-oculta">
     <h3>✅ Operación realizada correctamente</h3>
-    <p>Gracias por tu compra. Recibirás un correo con los detalles de tu pedido.</p>
+    <p>
+      Gracias por tu compra. Recibirás un correo con los detalles de tu pedido.
+    </p>
     <a href="/" class="btn-volver">Volver al catálogo</a>
   </div>
 </main>

@@ -1,3 +1,9 @@
+// Oculto icono del carrito en la página del carrito
+  if (window.location.pathname.includes("/checkout")) {
+    const cart = document.querySelector(".header-actions #cart");
+    if (cart) cart.style.display = "none";
+  }
+
 // Función de validación genérica de valores y tipos de campo
 function validarCampo(tipo, valor) {
   valor = valor.trim();
@@ -18,6 +24,10 @@ function validarCampo(tipo, valor) {
   }
 
   return validadores[tipo](valor);
+}
+
+function totalPagar(){
+  return localStorage.getItem("total_price") || "0.00";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -55,6 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
       efectivoSection.style.display = "grid";
       // no required
     }
+
+
+    document.getElementById("totalPriceCheckout").textContent = totalPagar();
   }
 
   // Manejo de cambio en los radios

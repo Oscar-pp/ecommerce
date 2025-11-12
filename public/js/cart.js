@@ -73,7 +73,7 @@ function initCartDropdown() {
 --------------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
   initCartDropdown();
-  // Ocultao icono del carrito en la página del carrito
+  // Oculto icono del carrito en la página del carrito
   if (window.location.pathname.includes("/cart")) {
     const cart = document.querySelector(".header-actions #cart");
     if (cart) cart.style.display = "none";
@@ -134,7 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       totalPriceEl.textContent = `${total.toFixed(2)} €`;
-      checkoutBtn.dataset.total = total.toFixed(2); // actualiza el data-total
+      // checkoutBtn.dataset.total = total.toFixed(2); // actualiza el data-total
+      localStorage.setItem("total_price", total.toFixed(2));
     }
 
     // Evento: cambio de cantidad
@@ -178,7 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         totalPriceEl.textContent = `${total.toFixed(2)} €`;
-        checkoutBtn.dataset.total = total.toFixed(2); // actualiza el data-total
+       // checkoutBtn.dataset.total = total.toFixed(2); // actualiza el data-total
+        localStorage.setItem("total_price", total.toFixed(2));
       }
     });
 
