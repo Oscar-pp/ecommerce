@@ -16,57 +16,92 @@ function initCartDropdown() {
     if (!opened) {
       const cartItems = getCart();
       cartItemsContainer.innerHTML = "";
-      if (cartItems.length > 0) {
-        await renderCartItems(cartItems);
-      } else {
+
+      if (cartItems.length === 0) {
         cartItemsContainer.innerHTML = "<li>El carrito está vacío</li>";
+        return;
+      }
+
+      // Mostrar indicador de carga
+      cartItemsContainer.innerHTML = "<li>Cargando productos...</li>";
+
+      try {
+        await renderCartItems(cartItems);
+      } catch (error) {
+        console.error("Error al renderizar el carrito:", error);
+        cartItemsContainer.innerHTML = "<li>Error al cargar los productos.</li>";
       }
     }
   });
 
   async function renderCartItems(cartItems) {
-    for (const id of cartItems) {
-      try {
-        const res = await fetch(`/api/productos/${id}`);
-        const product = await res.json();
+    // Realiza todas las solicitudes en paralelo
+    const productPromises = cartItems.map(async (id) => {
+      const res = await fetch(`/api/productos/${id}`);
+      if (!res.ok) throw new Error(`Error al obtener producto ${id}`);
+      return res.json();
+    });
 
-        const card = document.createElement("li");
-        card.className = "cart-item";
-        card.innerHTML = `
-          <button class="cart-item-remove" data-id="${product.id_producto}">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-          <img src="/images/${product.imagen_url}" alt="${product.nombre}" class="cart-item-image">
-          <div class="cart-item-details">
-            <h4 class="cart-item-name">${product.nombre}</h4>
-            <p class="cart-item-price">$${product.precio}</p>
-          </div>
-        `;
-        cartItemsContainer.appendChild(card);
+    const products = await Promise.allSettled(productPromises);
 
-        const btnRemove = card.querySelector(".cart-item-remove");
-        btnRemove.addEventListener("click", function (e) {
-          e.stopPropagation();
-          removeFromCart(product.id_producto);
-          card.remove();
-          updateCartCounter();
-        });
-      } catch (error) {
-        console.error("Error al cargar el producto:", error);
+    const fragment = document.createDocumentFragment();
+    cartItemsContainer.innerHTML = ""; // limpia el loader
+
+    for (const result of products) {
+      if (result.status !== "fulfilled") {
+        const errorItem = document.createElement("li");
+        errorItem.textContent = "Error al cargar un producto.";
+        fragment.appendChild(errorItem);
+        continue;
       }
+
+      const product = result.value;
+
+      const card = document.createElement("li");
+      card.className = "cart-item";
+      card.innerHTML = `
+        <button class="cart-item-remove" data-id="${product.id_producto}">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+        <img src="/images/${product.imagen_url}" alt="${product.nombre}" class="cart-item-image">
+        <div class="cart-item-details">
+          <h4 class="cart-item-name">${product.nombre}</h4>
+          <p class="cart-item-price">$${product.precio}</p>
+        </div>
+      `;
+
+      const btnRemove = card.querySelector(".cart-item-remove");
+      btnRemove.addEventListener("click", (e) => {
+        e.stopPropagation();
+        removeFromCart(product.id_producto);
+        card.remove();
+        updateCartCounter();
+
+        // Si ya no quedan ítems, mostrar mensaje vacío
+        if (!cartItemsContainer.querySelector(".cart-item")) {
+          cartItemsContainer.innerHTML = "<li>El carrito está vacío</li>";
+        }
+      });
+
+      fragment.appendChild(card);
     }
+
+    cartItemsContainer.appendChild(fragment);
   }
 
-  document.addEventListener("click", function (e) {
+  // Cierra al hacer clic fuera
+  document.addEventListener("click", (e) => {
     if (!dropdown.contains(e.target) && e.target !== btn) setExpanded(false);
   });
 
-  document.addEventListener("keydown", function (e) {
+  // Cierra con tecla Escape
+  document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setExpanded(false);
   });
 
   setExpanded(false);
 }
+
 
 /* -------------------------------
    RENDERIZADO DEL CARRITO
@@ -134,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       totalPriceEl.textContent = `${total.toFixed(2)} €`;
-      // checkoutBtn.dataset.total = total.toFixed(2); // actualiza el data-total
       localStorage.setItem("total_price", total.toFixed(2));
     }
 

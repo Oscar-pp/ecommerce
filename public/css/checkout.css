@@ -139,6 +139,44 @@ input {
   margin-top: 1rem;
 } */
 
+/* Contenedor principal del mensaje */
+.error {
+  position: fixed;  
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ff4d4f;
+  color: white;
+  padding: 1.2rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  /* display: flex; */
+  align-items: center;
+  gap: 1rem;
+  z-index: 1000;
+  min-width: 280px;
+  max-width: 90%;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+}
+
+/* Botón de cerrar */
+.close-error-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.close-error-btn:hover {
+  transform: scale(1.2);
+  color: #ffe6e6;
+}
+
+
 /* Estilo para el modal de confirmación */
 #mensaje-confirmacion {
   position: fixed;

@@ -4,6 +4,7 @@ if (window.location.pathname.includes("/checkout")) {
   if (cart) cart.style.display = "none";
 }
 
+// Función para mostrar/ocultar el GIF de carga
 function loadingGIF(show) {
   const loadingOverlay = document.getElementById("loading-overlay");
   if (show) {
@@ -14,7 +15,6 @@ function loadingGIF(show) {
     loadingOverlay.classList.add("loading-hidden");
   }
 }
-
 
 // Función de validación genérica de valores y tipos de campo
 function validarCampo(tipo, valor) {
@@ -40,6 +40,21 @@ function totalPagar() {
   const total = localStorage.getItem("total_price") || "0.00";
   return total;
 }
+
+function showError(message) {
+  const errorBox = document.getElementById("error-box");
+  const errorMessage = document.getElementById("error-message");
+
+  errorMessage.textContent = message;
+  errorBox.hidden = false;
+}
+
+function hideError() {
+  const errorBox = document.getElementById("error-box");
+  errorBox.hidden = true;
+}
+
+document.getElementById("close-error")?.addEventListener("click", hideError);
 
 document.addEventListener("DOMContentLoaded", () => {
   const btnPagar = document.querySelector(".btn-pagar");
@@ -100,8 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mensaje = document.getElementById("mensaje-confirmacion");
     mensaje.classList.add("confirmacion-oculta");
 
-    // Gif procesando
-    loadingGIF(true);
+    
 
     setTimeout(() => {
       const data = {};
@@ -123,9 +137,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (hasError) {
         loadingGIF(false);
-        alert("Por favor, completa todos los campos obligatorios.");
-
+        showError("Por favor, completa todos los campos obligatorios correctamente.");
         return;
+      } else {
+        loadingGIF(true);
       }
       console.log("Datos válidos:", data);
       // Guardar información de pago en el backend
