@@ -24,7 +24,13 @@ ACCESIBILIDAD:
 - Mensajes de error y estados visuales
 */
 
-import { addToCart, isInCart, updateCartCounter, removeFromCart, getCart } from "./cart.js";
+import {
+  addToCart,
+  isInCart,
+  updateCartCounter,
+  removeFromCart,
+  getCart,
+} from "./cart.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.querySelector(".toggle-filtros");
@@ -38,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const datalist = document.getElementById("productos");
   const catalogo = document.querySelector(".catalogo");
   const categoria = document.getElementById("option-category");
-  
+
   // Primera carga del contador del carrito
   updateCartCounter();
 
@@ -137,13 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     star.addEventListener("click", () => {
       const value = parseInt(star.getAttribute("data-value"));
-      
+
       if (value === currentValue) {
         // Deseleccionar todo cuando se hace clic en la estrella actual
         currentValue = 0;
         filtrosActivos.estrellas = 0;
         // Desmarcar todos los inputs radio
-        document.querySelectorAll('.star-input').forEach(input => {
+        document.querySelectorAll(".star-input").forEach((input) => {
           input.checked = false;
         });
       } else {
@@ -182,7 +188,9 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "product-card";
       card.innerHTML = `
         <a href="/detail/${p.id_producto}">
-          <img src="images/${p.imagen_url}" loading="lazy" decoding="async" width="110" height="150" alt="${
+          <img src="images/${
+            p.imagen_url
+          }" loading="lazy" decoding="async" width="110" height="150" alt="${
         p.descripcion
       }" class="product-img" />
         </a>
@@ -196,42 +204,45 @@ document.addEventListener("DOMContentLoaded", () => {
               .map((i) => (i <= p.star_product ? "⭐" : "☆"))
               .join("")}
           </div>
-          <button class="btn-add" data-id="${p.id_producto}">Añadir al carrito</button>
+          <button class="btn-add" data-id="${
+            p.id_producto
+          }">Añadir al carrito</button>
         </div>
       `;
       catalogo.appendChild(card);
 
       // Añadir funcionalidad al botón "Añadir al carrito"
-      const btnAdd = card.querySelector(".btn-add");
-      btnAdd.addEventListener("click", () => {
-        if (isInCart(p.id_producto)) {
-          // Ya existe en el carrito
-          btnAdd.textContent = "✖ Ya en carrito";
-          btnAdd.style.backgroundColor = "#f24848ff";
-          setTimeout(() => {
-            btnAdd.textContent = "Añadir al carrito";
-            btnAdd.style.backgroundColor = "";
-          }, 1000);
-          return;
-        }
-          
-        // Añadir al carrito
-        addToCart(p.id_producto);
-        
-        // Actualizar contador
-        updateCartCounter();
-        
-        // No existe en el carrito - Añadir con feedback visual
-        btnAdd.textContent = "✓ Añadido";
-        btnAdd.style.backgroundColor = "#4CAF50";
-        setTimeout(() => {
-          btnAdd.textContent = "Añadir al carrito";
-          btnAdd.style.backgroundColor = "";
-        }, 1000);
+      // Añadir funcionalidad al botón "Añadir al carrito"
+const btnAdd = card.querySelector(".btn-add");
+btnAdd.addEventListener("click", () => {
+  if (isInCart(p.id_producto)) {
+    // Ya existe en el carrito
+    btnAdd.textContent = "✖ Ya en carrito";
+    btnAdd.style.backgroundColor = "#f24848ff";
+    setTimeout(() => {
+      btnAdd.textContent = "Añadir al carrito";
+      btnAdd.style.backgroundColor = "";
+    }, 1000);
+    return;
+  }
 
-      });
+  // Añadir el producto completo al carrito
+  addToCart(p);
+
+  // Actualizar contador
+  updateCartCounter();
+
+  // Feedback visual
+  btnAdd.textContent = "✓ Añadido";
+  btnAdd.style.backgroundColor = "#4CAF50";
+  setTimeout(() => {
+    btnAdd.textContent = "Añadir al carrito";
+    btnAdd.style.backgroundColor = "";
+  }, 1000);
+});
+
     });
-  };
+  }
 
   /* -------------------------------
      FUNCIÓN PARA CARGAR PRODUCTOS

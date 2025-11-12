@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
+import bcrypt from "bcrypt";
 
 // Cargar variables de entorno
 dotenv.config();
@@ -20,6 +21,8 @@ app.set("views", path.join(__dirname, "../views"));
 
 // Middleware para archivos estáticos
 app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configuración de la base de datos
 const dbConfig = {
@@ -89,7 +92,7 @@ app.get("/detail/:id_producto", async (req, res) => {
 });
 
 app.get("/cart", async (req, res) => {
-  try {    
+  try {
     // Renderizamos la vista
     res.render("index", {
       titulo: `Carrito compras`,
@@ -104,10 +107,10 @@ app.get("/cart", async (req, res) => {
 
 app.get("/checkout", async (req, res) => {
   try {
-    res.render("index", { 
+    res.render("index", {
       titulo: `Realizar pago`,
       zonaMain: "checkout",
-      filecss: "/css/checkout.css", 
+      filecss: "/css/checkout.css",
     });
   } catch (error) {
     console.error("Error al consultar la base de datos:", error);
@@ -125,8 +128,6 @@ app.get("/dashboard", async (req, res) => {
     res.status(500).send("Error al cargar dashboard");
   }
 });
-
-
 
 /*
     API 
@@ -154,11 +155,12 @@ app.get("/api/allProductos", async (req, res) => {
     console.log(ids);
     if (!ids) {
       return res.status(400).json({ error: "Faltan IDs de productos" });
-    };
+    }
 
     const idArray = ids.split(",").map(Number);
     console.log(idArray);
-    const [productos] = await pool.query(`SELECT 
+    const [productos] = await pool.query(
+      `SELECT 
                                             p.id_producto,
                                             p.nombre AS nombre_producto,
                                             p.descripcion,
@@ -176,16 +178,17 @@ app.get("/api/allProductos", async (req, res) => {
                                           FROM productos p
                                           INNER JOIN vendedores v ON p.id_vendedor = v.id_vendedor
                                           WHERE p.id_producto IN (?)
-                                        `, [idArray]);
+                                        `,
+      [idArray]
+    );
 
-      console.log(productos);
+    console.log(productos);
 
     if (!productos.length) {
       return res.status(404).json({ error: "No se encontraron productos" });
     }
 
     res.json(productos);
-    
   } catch (error) {
     console.error("❌ Error en /api/allProductos:", error);
     res.status(500).json({ error: "Error en el servidor" });
@@ -238,6 +241,125 @@ app.get("/api/productos/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+/* 
+  inserts de usuario
+*/
+// Endpoint para registrar un usuario
+app.post("/api/usuarios", async (req, res) => {
+  const { nombre, apellidos, email, contrasenya, telefono, direccion, cp } = req.body;
+
+  try {
+    // Verificar si el email ya existe
+    const [existingUsers] = await pool.query(
+      "SELECT id_usuario, contraseña FROM usuarios WHERE email = ?",
+      [email]
+    );
+
+    let id_usuario;
+
+    if (existingUsers.length > 0) {
+      // El usuario ya existe, validar la contraseña
+      const user = existingUsers[0];
+      const isPasswordValid = await bcrypt.compare(contrasenya, user.contraseña);
+
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: "Contraseña incorrecta." });
+      }
+
+      // Si la contraseña es válida, usar el ID del usuario existente
+      id_usuario = user.id_usuario;
+    } else {
+      // El usuario no existe, registrarlo
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(contrasenya, saltRounds);
+
+      const [result] = await pool.query(
+        "INSERT INTO usuarios (nombre, apellidos, email, contraseña, telefono, direccion, cp) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [nombre, apellidos, email, hashedPassword, telefono, direccion, cp]
+      );
+
+      id_usuario = result.insertId;
+    }
+
+    // Devolver el ID del usuario (existente o recién registrado)
+    res.status(200).json({ id_usuario });
+  } catch (error) {
+    console.error("Error al manejar el usuario:", error);
+    res.status(500).json({ error: "Error al procesar el usuario." });
+  }
+});
+
+
+
+// Endpoint para registrar un pedido
+app.post("/api/pedidos", async (req, res) => {
+  // 1. Obtener los datos del cuerpo de la solicitud
+  const { id_usuario, total, productos } = req.body;
+
+  // 2. Validar que los datos requeridos estén presentes
+  if (!id_usuario || !total || !productos || !Array.isArray(productos)) {
+    return res.status(400).json({
+      error: "Faltan datos requeridos o el formato de los productos es inválido."
+    });
+  }
+
+  // 3. Validar que el array de productos no esté vacío
+  if (productos.length === 0) {
+    return res.status(400).json({
+      error: "No se pueden registrar pedidos sin productos."
+    });
+  }
+
+  // 4. Obtener una conexión del pool y comenzar una transacción
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // 5. Insertar el pedido en la tabla `pedidos`
+    const [pedidoResult] = await connection.query(
+      "INSERT INTO pedidos (id_usuario, total, estado) VALUES (?, ?, 'pendiente')",
+      [id_usuario, total]
+    );
+    const id_pedido = pedidoResult.insertId;
+
+    // 6. Insertar cada producto en la tabla `pedidos_productos`
+    for (const producto of productos) {
+      const { id_producto, cantidad, precio_unitario } = producto;
+
+      // Validar que los datos del producto estén completos
+      if (!id_producto || !cantidad || !precio_unitario) {
+        await connection.rollback();
+        return res.status(400).json({
+          error: `Datos incompletos para el producto con ID ${id_producto}.`
+        });
+      }
+
+      // Insertar el producto en `pedidos_productos`
+      await connection.query(
+        "INSERT INTO pedidos_productos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)",
+        [id_pedido, id_producto, cantidad, precio_unitario]
+      );
+    }
+
+    // 7. Confirmar la transacción si todo salió bien
+    await connection.commit();
+    res.status(201).json({
+      id_pedido,
+      message: "Pedido registrado correctamente."
+    });
+  } catch (error) {
+    // 8. Revertir la transacción si ocurre un error
+    await connection.rollback();
+    console.error("Error al registrar el pedido:", error);
+    res.status(500).json({
+      error: "Ocurrió un error al registrar el pedido. Inténtalo de nuevo."
+    });
+  } finally {
+    // 9. Liberar la conexión de vuelta al pool
+    connection.release();
   }
 });
 

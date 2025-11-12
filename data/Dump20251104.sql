@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `ecommerce` /*!40100 DEFAULT CHARACTER SET utf8mb
 USE `ecommerce`;
 -- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
--- Host: localhost    Database: ecommerce
+-- Host: 127.0.0.1    Database: ecommerce
 -- ------------------------------------------------------
 -- Server version	8.0.42
 
@@ -104,7 +104,7 @@ CREATE TABLE `productos` (
   PRIMARY KEY (`id_producto`),
   KEY `idx_vendedor` (`id_vendedor`),
   CONSTRAINT `fk_producto_vendedor` FOREIGN KEY (`id_vendedor`) REFERENCES `vendedores` (`id_vendedor`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -113,7 +113,7 @@ CREATE TABLE `productos` (
 
 LOCK TABLES `productos` WRITE;
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
-INSERT INTO `productos` VALUES (1,1,'Libro JavaScript','Guía completa para aprender JS desde cero.',29.99,10,'Cultura','libro_js.jpg','2025-11-03 18:57:53','2025-11-03 18:57:53','2025-11-03 18:57:53',1),(2,2,'Camiseta Eco','Camiseta 100% algodón orgánico.',19.99,20,'Ropa','camiseta_eco.jpg','2025-11-03 18:57:53','2025-11-03 18:57:53','2025-11-03 18:59:45',3),(3,2,'Sudadera React','Sudadera con logotipo de React. Ideal para programadores.',34.99,15,'Ropa','sudadera_react.jpg','2025-11-03 18:57:53','2025-11-03 18:57:53','2025-11-03 18:59:45',0),(4,1,'TV 43\'\' curva','Televisión pantalla Led de 43\'\' curva con dolby sorround',450.00,5,'Tecnología','tv43.jpg','2025-11-03 19:02:13','2025-11-03 19:02:13','2025-11-03 19:02:13',5);
+INSERT INTO `productos` VALUES (1,1,'Libro JavaScript','Guía completa para aprender JS desde cero.',29.99,10,'Cultura','libro_js.jpg','2025-11-03 18:57:53','2025-11-03 18:57:53','2025-11-03 18:57:53',1),(2,2,'Camiseta Eco','Camiseta 100% algodón orgánico.',19.99,20,'Ropa','camiseta_eco.jpg','2025-11-03 18:57:53','2025-11-03 18:57:53','2025-11-03 18:59:45',3),(3,2,'Sudadera React','Sudadera con logotipo de React. Ideal para programadores.',34.99,15,'Ropa','sudadera_react.jpg','2025-11-03 18:57:53','2025-11-03 18:57:53','2025-11-03 18:59:45',0),(4,1,'TV 43\'\' curva','Televisión pantalla Led de 43\'\' curva con dolby sorround',450.00,5,'Tecnología','tv43.jpg','2025-11-03 19:02:13','2025-11-03 19:02:13','2025-11-03 19:02:13',5),(5,1,'Roomba','Limpia y frega automáticamente',650.00,3,'Tecnología','roomba.jpg','2025-11-07 09:41:04','2025-11-07 09:41:04','2025-11-07 09:41:04',4);
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -138,6 +138,7 @@ CREATE TABLE `usuarios` (
   `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
   `fecha_creacion` datetime DEFAULT CURRENT_TIMESTAMP,
   `fecha_ultima_modificacion` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `cp` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -177,7 +178,7 @@ CREATE TABLE `valoraciones` (
   CONSTRAINT `fk_valoracion_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
   CONSTRAINT `fk_valoracion_vendedor` FOREIGN KEY (`id_vendedor`) REFERENCES `vendedores` (`id_vendedor`) ON DELETE CASCADE,
   CONSTRAINT `valoraciones_chk_1` CHECK ((`puntuacion` between 1 and 5))
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -233,4 +234,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-04 20:12:11
+-- Dump completed on 2025-11-12 17:52:08
