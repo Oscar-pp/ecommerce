@@ -109,6 +109,23 @@
   transform: translateY(-2px);
 }
 
+.confirmacion-content p:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.btn-volver {
+  align-self: center;
+  background: #00a884;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.8rem 1.8rem;
+  margin-top: 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
 input {
   box-sizing: border-box;
   width: 100%;
@@ -184,8 +201,8 @@ input {
 }
 
 .loading-gif {
-  width: 80px;
-  height: 80px;
+  width: 180px;
+  height: 180px;
 }
 
 .loading-hidden {
