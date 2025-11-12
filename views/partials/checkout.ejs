@@ -148,12 +148,24 @@
     <button type="button" class="btn-pagar">💳 Realizar pago</button>
   </form>
 
+  <!-- Mensaje de confirmación -->
   <div id="mensaje-confirmacion" class="confirmacion-oculta">
-    <h3>✅ Operación realizada correctamente</h3>
-    <p>
-      Gracias por tu compra. Recibirás un correo con los detalles de tu pedido.
-    </p>
-    <a href="/" class="btn-volver">Volver al catálogo</a>
+    <div class="confirmacion-content">
+      <h3>✅ Operación realizada correctamente</h3>
+      <p>
+        Gracias por tu compra. Recibirás un correo con los detalles de tu
+        pedido.
+      </p>
+      <a href="/" class="btn-volver">Volver al catálogo</a>
+    </div>
+  </div>
+
+  <!-- Procesando pago -->
+  <div id="loading-overlay" class="loading-hidden">
+    <div class="loading-content">
+      <img src="../../public/images/icons8-en-progreso-96.gif" alt="Procesando..." class="loading-gif" />
+      <p>Procesando tu pago...</p>
+    </div>
   </div>
 </main>
 

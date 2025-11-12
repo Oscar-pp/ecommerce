@@ -114,14 +114,85 @@ input {
   width: 100%;
 }
 
-.confirmacion-oculta {
+/* .confirmacion-oculta {
   display: none;
   text-align: center;
   color: #007a6b;
   font-weight: 600;
   margin-top: 1rem;
+} */
+
+/* Estilo para el modal de confirmación */
+#mensaje-confirmacion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
 }
 
+#mensaje-confirmacion.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#mensaje-confirmacion .confirmacion-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.confirmacion-oculta {
+  display: none !important;
+}
+
+/* Estilo para el overlay de carga */
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+#loading-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-gif {
+  width: 80px;
+  height: 80px;
+}
+
+.loading-hidden {
+  display: none;
+}
+
+/* Asterisco rojo para campos obligatorios */
 label:has(+ input[required])::after {
   content: "*";
   color: red;
