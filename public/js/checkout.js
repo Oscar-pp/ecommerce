@@ -26,8 +26,12 @@ function validarCampo(tipo, valor) {
   return validadores[tipo](valor);
 }
 
+// Función para obtener el total a pagar y limpiar el almacenamiento
+// para que sea invisible el valor al cargar el /checkout
 function totalPagar(){
-  return localStorage.getItem("total_price") || "0.00";
+  const total = localStorage.getItem("total_price") || "0.00";
+  localStorage.removeItem("total_price");
+  return total;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
