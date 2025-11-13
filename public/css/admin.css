@@ -1,0 +1,196 @@
+/* admin.css */
+:root {
+  --color-primary: #00a884;
+  --color-primary-dark: #008f73;
+  --color-accent: #4a90e2;
+  --color-bg: #f7f9f8;
+  --color-bg-light: #ffffff;
+  --color-bloques-filtros:  #00a88440;
+  --color-border: #ddd;
+  --color-border-light: #e2e6e4;
+  --color-text: #333;
+  --color-text-muted: #666;
+  --color-warning: #ffc107;
+  --radius: 12px;
+  --shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-container {
+  display: flex;
+  gap: 1rem;
+  background: var(--color-bg);
+  padding: 1rem;
+  border-radius: var(--radius);
+}
+
+/* FORMULARIO */
+.product-form {
+  flex: 1;
+  background: var(--color-primary);
+  color: var(--color-bg-light);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.product-form h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.product-form label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: bold;
+}
+
+.product-form input,
+.product-form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-light);
+  margin-top: 0.25rem;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.form-group {
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.form-group:last-child {
+  margin-right: 0;
+}
+
+/* ACCIONES */
+.actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn {
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 10%;
+  color: var(--color-text);
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.btn-new { background: var(--color-warning); color: #333; }
+.btn-edit { background: var(--color-primary-dark); }
+.btn-delete { background: #ff6b6b; }
+.btn-help { background: var(--color-accent); }
+
+/* LISTADO PRODUCTOS */
+.product-list {
+  flex: 2;
+  background: var(--color-bg-light);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.product-list h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* ============================================================
+   🔹 CONTENEDOR DE GRID DE PRODUCTOS
+   ============================================================ */
+#grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;          /* espacio entre cards */
+  min-height: 400px;
+  padding: 10px;
+}
+
+/* ============================================================
+   🔹 TARJETAS DE PRODUCTO ADMIN (COMPACTO)
+   ============================================================ */
+.product-card-admin {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  width: 200px;
+  height: 320px;
+  padding: 0.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+  border: 2px solid transparent; /* borde por defecto */
+}
+
+.product-card-admin.selected {
+  border: 2px solid #4CAF50; /* color verde cuando está seleccionada */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+.product-card-admin:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* ============================================================
+   🔹 IMAGEN DEL PRODUCTO
+   ============================================================ */
+.product-img-admin {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 0.3rem;  /* reduce espacio entre imagen y info */
+}
+
+/* ============================================================
+   🔹 INFORMACIÓN DEL PRODUCTO
+   ============================================================ */
+.product-info-admin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;              /* espacio pequeño entre elementos */
+}
+
+.product-title-admin {
+  font-size: 1em;
+  margin: 0;
+  min-height: 1.6em;      /* menos altura que antes */
+  line-height: 1.2em;
+}
+
+.product-price-admin {
+  font-weight: bold;
+  margin: 2px 0;
+  color: var(--color-primary-dark);
+}
+
+.product-rating-admin {
+  margin: 3px 0;
+  color: var(--color-warning);
+  font-size: 0.9em;
+}
+
+

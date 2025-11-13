@@ -129,6 +129,22 @@ app.get("/dashboard", async (req, res) => {
   }
 });
 
+app.get("/admin", async (req, res) => {
+  try {
+
+
+
+    res.render("admin", {
+      titulo: `Zona administrativa negocio`,
+      zonaMain: "admin",
+      filecss: "/css/admin.css",
+    });
+  } catch (error) {
+    console.error("Error al consultar la base de datos:", error);
+    res.status(500).send("Error al cargar admin");
+  }
+});
+
 /*
     API 
 */
@@ -191,6 +207,17 @@ app.get("/api/allProductos", async (req, res) => {
     res.json(productos);
   } catch (error) {
     console.error("❌ Error en /api/allProductos:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+ 
+app.get("/api/todosProductos", async (req, res) => {
+  const id_vendedor = req.query.id_vendedor; 
+  try {
+    const [productos] = await pool.query(`SELECT * FROM productos WHERE id_vendedor = ?`, id_vendedor);
+    res.json(productos);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
@@ -291,8 +318,6 @@ app.post("/api/usuarios", async (req, res) => {
     res.status(500).json({ error: "Error al procesar el usuario." });
   }
 });
-
-
 
 // Endpoint para registrar un pedido
 app.post("/api/pedidos", async (req, res) => {
