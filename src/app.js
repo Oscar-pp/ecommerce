@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
+import upload from "./multer.js";
 
 // Cargar variables de entorno
 dotenv.config();
@@ -131,9 +132,6 @@ app.get("/dashboard", async (req, res) => {
 
 app.get("/admin", async (req, res) => {
   try {
-
-
-
     res.render("admin", {
       titulo: `Zona administrativa negocio`,
       zonaMain: "admin",
@@ -270,6 +268,98 @@ app.get("/api/productos/:id", async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
+
+// -------------------------------
+// INSERT / UPDATE PRODUCTO ADMIN
+// -------------------------------
+app.post("/api/producto/save", upload.single("imagen"), async (req, res) => {
+  try {
+    const {
+      modo,
+      id_producto,
+      id_vendedor,
+      nombre,
+      descripcion,
+      categoria,
+      precio,
+      uds,
+      imagen_actual
+    } = req.body;
+console.log(req.body);
+console.log(req.file);
+    // Validar que los valores numéricos sean correctos
+    const idProd = id_producto ? Number(id_producto) : 0;
+    const idVendedor = Number(id_vendedor);
+    const cantidad = Number(uds);
+    const precioNum = Number(precio);
+
+    // Validar que los valores numéricos no sean NaN
+    if (isNaN(idVendedor) || isNaN(cantidad) || isNaN(precioNum)) {
+      console.error("Valores numéricos inválidos:", { idVendedor, cantidad, precioNum });
+      return res.status(400).json({ error: "Los valores numéricos no son válidos." });
+    }
+
+    // Determinar imagen a usar
+    let imagen = imagen_actual; // imagen actual por defecto
+    if (req.file) imagen = req.file.filename; // si sube archivo nuevo
+
+    if (modo === "insert" || idProd === 0) {
+      // INSERT
+      const sql = `
+        INSERT INTO productos
+        (id_vendedor, nombre, descripcion, categoria, precio, cantidad_disponible, imagen_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      console.log(idVendedor);
+      await pool.query(sql, [
+        2,
+        nombre,
+        descripcion,
+        categoria,
+        precioNum,
+        cantidad,
+        imagen
+      ]);
+      return res.json({ message: "Producto insertado correctamente" });
+    }
+
+    if (modo === "update" && idProd > 0) {
+      // UPDATE
+      const sql = `
+        UPDATE productos SET
+        nombre=?, descripcion=?, categoria=?, precio=?, cantidad_disponible=?, imagen_url=?
+        WHERE id_producto=?
+      `;
+      await pool.query(sql, [
+        nombre,
+        descripcion,
+        categoria,
+        precioNum,
+        cantidad,
+        imagen,
+        idProd
+      ]);
+      return res.json({ message: "Producto actualizado correctamente" });
+    }
+
+    return res.status(400).json({ error: "Petición no válida" });
+  } catch (err) {
+    console.error("Error al guardar producto:", err);
+    res.status(500).json({ error: "Error al guardar producto" });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* 
   inserts de usuario

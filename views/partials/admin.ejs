@@ -2,8 +2,11 @@
   <!-- FORMULARIO PRODUCTO -->
   <section class="product-form">
     <h2>Formulario Producto</h2>
-    <form id="product-form">
+
+    <form id="product-form" enctype="multipart/form-data">
       <input type="hidden" id="id_producto" name="id_producto">
+      <input type="hidden" id="id_vendedor" name="id_vendedor">
+      <input type="hidden" id="imagen_actual" name="imagen_actual">
 
       <label>Nombre</label>
       <input type="text" id="nombre" name="nombre" placeholder="Nombre del producto">
@@ -19,20 +22,30 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>UDS</label>
+          <label>Unidades</label>
           <input type="number" id="uds" name="uds" placeholder="0">
         </div>
+
         <div class="form-group">
           <label>Imagen</label>
+
+          <!-- Input oculto cuando hay imagen -->
           <input type="file" id="imagen" name="imagen" accept="image/*">
+
+          <img src="" id="imagenProducto" alt="">
+          <button type="button" id="btnCambiarImagen" style="margin-top:8px;">Cambiar imagen</button>
         </div>
       </div>
+
+      <button type="button" id="btnGuardar" class="btn btn-new" style="margin-top:20px;">
+        Guardar Producto
+      </button>
     </form>
   </section>
 
   <!-- BOTONES DE ACCIÓN -->
   <section class="actions">
-    <button class="btn btn-new">Nuevo</button>
+    <button class="btn btn-new" id="btnNuevo">Nuevo</button>
     <button class="btn btn-edit disabled">Editar</button>
     <button class="btn btn-delete disabled">Eliminar</button>
     <button class="btn btn-help disabled">Limpiar</button>
@@ -46,4 +59,3 @@
     </div>
   </section>
 </div>
-

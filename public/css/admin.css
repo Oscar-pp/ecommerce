@@ -173,6 +173,7 @@
   padding: 0.5rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
   border: 2px solid transparent; /* borde por defecto */
+  cursor:pointer;
 }
 
 .product-card-admin.selected {
@@ -193,6 +194,13 @@
   object-fit: cover;
   display: block;
   margin-bottom: 0.3rem; /* reduce espacio entre imagen y info */
+}
+
+#imagenProducto {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  display: block;
 }
 
 /* ============================================================
@@ -223,4 +231,8 @@
   margin: 3px 0;
   color: var(--color-warning);
   font-size: 0.9em;
+}
+
+#uds {
+  width: 40px;
 }
