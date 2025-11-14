@@ -2,27 +2,29 @@
   <!-- FORMULARIO PRODUCTO -->
   <section class="product-form">
     <h2>Formulario Producto</h2>
-    <form>
+    <form id="product-form">
+      <input type="hidden" id="id_producto" name="id_producto">
+
       <label>Nombre</label>
-      <input type="text" name="nombre" placeholder="Nombre del producto">
+      <input type="text" id="nombre" name="nombre" placeholder="Nombre del producto">
 
       <label>Descripción</label>
-      <textarea name="descripcion" placeholder="Descripción"></textarea>
+      <textarea id="descripcion" name="descripcion" placeholder="Descripción"></textarea>
 
       <label>Categoría</label>
-      <input type="text" name="categoria" placeholder="Categoría">
+      <input type="text" id="categoria" name="categoria" placeholder="Categoría">
 
       <label>Precio</label>
-      <input type="number" name="precio" placeholder="Precio">
+      <input type="number" id="precio" name="precio" placeholder="Precio">
 
       <div class="form-row">
         <div class="form-group">
           <label>UDS</label>
-          <input type="number" name="uds" placeholder="0">
+          <input type="number" id="uds" name="uds" placeholder="0">
         </div>
         <div class="form-group">
           <label>Imagen</label>
-          <input type="file" name="imagen" accept="image/*">
+          <input type="file" id="imagen" name="imagen" accept="image/*">
         </div>
       </div>
     </form>
@@ -31,9 +33,9 @@
   <!-- BOTONES DE ACCIÓN -->
   <section class="actions">
     <button class="btn btn-new">Nuevo</button>
-    <button class="btn btn-edit">Editar</button>
-    <button class="btn btn-delete">Eliminar</button>
-    <button class="btn btn-help">Limpiar</button>
+    <button class="btn btn-edit disabled">Editar</button>
+    <button class="btn btn-delete disabled">Eliminar</button>
+    <button class="btn btn-help disabled">Limpiar</button>
   </section>
 
   <!-- LISTADO DE PRODUCTOS -->

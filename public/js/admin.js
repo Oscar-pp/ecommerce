@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const id_vendedor = 1;
+  const id_vendedor = 2;
   const catalogo = document.getElementById("grid-container");
   const res = await fetch(`/api/todosProductos?id_vendedor=${id_vendedor}`);
   const productos = await res.json();
@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       <div class="product-info-admin">
         <h2 class="product-title-admin">${p.nombre}</h2>
-        <p class="product-price-admin">${p.precio} €</p>
+        <p class="product-price-admin">${p.precio} €  --  ${p.cantidad_disponible} Uds.</p>
+
         <div class="product-rating-admin">
           ${[1,2,3,4,5].map(i => i <= p.star_product ? "⭐" : "☆").join("")}
         </div>
@@ -37,6 +38,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         // si ya está seleccionada, desmarcar
         card.classList.remove("selected");
         selectedCard = null;
+        // si se deselecciona limpio el formulario
+        document.getElementById('product-form').reset();
       } else {
         // desmarcar la anterior
         if (selectedCard) selectedCard.classList.remove("selected");
@@ -44,11 +47,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         // marcar la nueva
         card.classList.add("selected");
         selectedCard = card;
+        // selecciono el producto y lo envio al formulario
+        const producto = productos.find(p => p.id_producto == card.dataset.id_producto);
+        llenarFormulario(producto);
       }
 
-      alert(card.dataset.id_producto);
+      // alert(card.dataset.id_producto);
     });
 
     catalogo.appendChild(card);
   });
 });
+
+
+function llenarFormulario(p) {
+  document.getElementById('id_producto').value = p.id_producto;
+  document.getElementById('nombre').value = p.nombre;
+  document.getElementById('descripcion').value = p.descripcion;
+  document.getElementById('categoria').value = p.categoria;
+  document.getElementById('precio').value = p.precio;
+  document.getElementById('uds').value = p.cantidad_disponible;
+  // document.getElementById('imagen').value = p.imagen_url;  ERROR POR EL TIPO DE CAMPO
+}
+
+function botodisabled(){
+  
+}
