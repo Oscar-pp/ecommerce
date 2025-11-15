@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
 import upload from "./multer.js";
+// import { mostrarMensaje } from "../public/js/admin.js";
 
 // Cargar variables de entorno
 dotenv.config();
@@ -289,13 +290,13 @@ console.log(req.body);
 console.log(req.file);
     // Validar que los valores numéricos sean correctos
     const idProd = id_producto ? Number(id_producto) : 0;
-    const idVendedor = Number(id_vendedor);
+    // const idVendedor = Number(id_vendedor);
     const cantidad = Number(uds);
     const precioNum = Number(precio);
 
     // Validar que los valores numéricos no sean NaN
-    if (isNaN(idVendedor) || isNaN(cantidad) || isNaN(precioNum)) {
-      console.error("Valores numéricos inválidos:", { idVendedor, cantidad, precioNum });
+    if (isNaN(id_vendedor) || isNaN(cantidad) || isNaN(precioNum)) {
+      console.error("Valores numéricos inválidos:", { id_vendedor, cantidad, precioNum });
       return res.status(400).json({ error: "Los valores numéricos no son válidos." });
     }
 
@@ -310,9 +311,9 @@ console.log(req.file);
         (id_vendedor, nombre, descripcion, categoria, precio, cantidad_disponible, imagen_url)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
-      console.log(idVendedor);
+      console.log("id del vendedor es : " , id_vendedor);
       await pool.query(sql, [
-        2,
+        id_vendedor,
         nombre,
         descripcion,
         categoria,
@@ -320,7 +321,7 @@ console.log(req.file);
         cantidad,
         imagen
       ]);
-      return res.json({ message: "Producto insertado correctamente" });
+      return res.json({ message: "Producto insertado correctamente" , tipo: "success"});
     }
 
     if (modo === "update" && idProd > 0) {
@@ -349,6 +350,23 @@ console.log(req.file);
   }
 });
 
+app.delete("/api/producto/delete", async (req, res) => {
+  try {
+    const { id_producto } = req.body;
+
+    if (!id_producto) {
+      return res.status(400).json({ error: "ID de producto no proporcionado." });
+    }
+
+    // Eliminar el producto
+    await pool.query("DELETE FROM productos WHERE id_producto = ?", [id_producto]);
+
+    res.json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar el producto:", error);
+    res.status(500).json({ error: "Error al eliminar el producto" });
+  }
+});
 
 
 
@@ -361,9 +379,9 @@ console.log(req.file);
 
 
 
-/* 
-  inserts de usuario
-*/
+/* -----------------------------------------------------
+  INSERT UPDATE DE USUARIO Y AÑADIR A PEDIDOS REALIZADOS
+  ------------------------------------------------------*/
 // Endpoint para registrar un usuario
 app.post("/api/usuarios", async (req, res) => {
   const { nombre, apellidos, email, contrasenya, telefono, direccion, cp } = req.body;
