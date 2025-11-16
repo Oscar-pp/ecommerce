@@ -41,6 +41,7 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 70px;
   background-color: var(--color-primary);
   padding: 12px 20px;
   color: white;
@@ -56,13 +57,9 @@ main {
 
 /* Logo */
 .logo {
-  width: 140px;
-  height: 56px;
-  border-radius: 8px;
-  object-fit: cover;
-  display: block;
-  background: #fff;
+  font-size: 3rem;
   padding: 6px;
+  color:rgb(220, 232, 220)
 }
 
 .inline-logo {
