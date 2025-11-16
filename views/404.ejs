@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Página no encontrada</title>
-</head>
+<%- include('partials/head') %>
+
 <body>
-    <h1>404 - Página no encontrada</h1>
-    <p><%= mensaje %></p>
-    <a href="/">Volver al inicio</a>
+    <%- include('partials/header') %>
+        <main class="error404">
+            <a href="/">
+                <button class="btn404">Volver al inicio</button>
+            </a>
+            <img src="images/404.avif" class="img404"  alt="Página no encontrada">
+            
+        </main>
+        <%- include('partials/footer') %>
 </body>
+
 </html>

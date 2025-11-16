@@ -335,6 +335,34 @@
   background-color: var(--color-primary-dark);
 }
 
+/* ======================================
+    ERROR 404
+   ====================================== */
+
+.error404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.img404 {
+  width: 450px;
+  margin-bottom: .5rem;
+}
+
+.btn404 {
+  background-color: var(--color-primary);
+  color: white;
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+
 /* ============================================================
    🔹 RESPONSIVIDAD
    ============================================================ */

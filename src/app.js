@@ -508,7 +508,10 @@ app.post("/api/pedidos", async (req, res) => {
 
 // Middleware para manejar errores 404
 app.use((req, res) => {
-  res.status(404).render("404", { mensaje: "Página no encontrada" });
+  res.status(404).render("404", { 
+    titulo: "Página no encontrada",
+    mensaje: "¡Bienvenido a MyShop!",
+    filecss: "../css/gallery.css",});
 });
 
 // Middleware para manejar errores 500
