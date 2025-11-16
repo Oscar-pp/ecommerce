@@ -32,7 +32,7 @@
 }
 
 .btn-addcart {
-  background-color: #0078d7;
+  background-color: #087a1b;
   color: white;
   border: none;
   padding: 0.8rem 1.2rem;
@@ -76,6 +76,6 @@ select#tipoRuta {
 }
 
 .volver {
-  color:aqua;
+  color:rgb(254, 255, 255);
   margin-top: 5rem;
 }

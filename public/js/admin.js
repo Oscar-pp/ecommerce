@@ -28,13 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       card.innerHTML = `
         <img src="images/${
           p.imagen_url || "imagen_no_disponible.png"
-        }" loading="lazy" width="110" height="150" class="product-img-admin" />
+        }" loading="lazy" width="110" height="150" class="product-img-admin" alt="${p.nombre}"/>
         <div class="product-info-admin">
           <h2 class="product-title-admin">${p.nombre}</h2>
-          <p class="product-price-admin">${p.precio} € — ${
-        p.cantidad_disponible
-      } Uds.</p>
-          <div class="product-rating-admin">
+          <p class="product-price-admin" aria-label="Precio">${p.precio} € — ${p.cantidad_disponible} Uds.</p>
+          <div class="product-rating-admin" aria-label="Valoración">
             ${[1, 2, 3, 4, 5]
               .map((i) => (i <= p.star_product ? "⭐" : "☆"))
               .join("")}

@@ -19,20 +19,34 @@ export function renderProductos(productos, container) {
     const card = document.createElement("section");
     card.className = "product-card";
     card.innerHTML = `
-      <a href="/detail/${p.id_producto}">
-        <img src="images/${p.imagen_url}" loading="lazy" decoding="async" width="110" height="150" alt="${p.descripcion}" class="product-img" />
-      </a>
-      <div class="product-info">
-        <a href="/detail/${p.id_producto}">
-          <h2 class="product-title">${p.nombre}</h2>
-        </a>
-        <p class="product-price">${p.precio} €</p>
-        <div class="product-rating">
-          ${[1, 2, 3, 4, 5].map(i => (i <= p.star_product ? "⭐" : "☆")).join("")}
-        </div>
-        <button class="btn-add" data-id="${p.id_producto}">Añadir al carrito</button>
-      </div>
-    `;
+  <a href="/detail/${p.id_producto}" aria-label="Ver detalles de ${p.nombre}">
+    <img
+      src="images/${p.imagen_url}"
+      loading="lazy"
+      decoding="async"
+      width="110"
+      height="150"
+      alt="${p.descripcion}"
+      class="product-img"
+    />
+  </a>
+  <div class="product-info">
+    <a href="/detail/${p.id_producto}" aria-label="Ver detalles de ${p.nombre}">
+      <h2 class="product-title">${p.nombre}</h2>
+    </a>
+    <p class="product-price" aria-label="Precio: ${p.precio} euros">${p.precio} €</p>
+    <div class="product-rating" aria-label="Valoración: ${p.star_product} de 5 estrellas" style="background:black;border-radius:8px;padding:.5rem;">
+    ${[1, 2, 3, 4, 5].map(i =>
+      `<span aria-hidden="true" class="star">${i <= p.star_product ? "⭐" : "☆"}</span>`
+    ).join("")}
+      <span class="sr-only">(${p.star_product} estrellas)</span>
+    </div>
+    <button class="btn-add" data-id="${p.id_producto}" aria-label="Añadir ${p.nombre} al carrito">
+      Añadir al carrito
+    </button>
+  </div>
+`;
+
     container.appendChild(card);
 
     const btnAdd = card.querySelector(".btn-add");

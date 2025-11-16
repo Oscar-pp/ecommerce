@@ -6,32 +6,44 @@
       </div>
 
       <div class="producto-info">
-        <h2 class="producto-titulo"><%= producto.nombre %></h2>
-        <p class="producto-precio"><%= Number(producto.precio).toFixed(2) %> €</p>
-        <p class="producto-descripcion"><%= producto.descripcion %></p>
-        <p class="producto-categoria">Categoría: <%= producto.categoria %></p>
-        <p class="producto-stock">Disponibles: <%= producto.cantidad_disponible %></p>
+        <h2 class="producto-titulo">
+          <%= producto.nombre %>
+        </h2>
+        <h3 class="producto-precio">
+          <%= Number(producto.precio).toFixed(2) %> €
+        </h3>
+        <p class="producto-descripcion">
+          <%= producto.descripcion %>
+        </p>
+        <p class="producto-categoria">Categoría: <%= producto.categoria %>
+        </p>
+        <p class="producto-stock">Disponibles: <%= producto.cantidad_disponible %>
+        </p>
+        <div class="product-rating" aria-label="Valoración: <%= producto.star_product %> de 5 estrellas"
+          style="background:rgba(6, 96, 35, 0.526);border-radius:8px;padding:.5rem;margin-bottom:1rem;">
+          <%= [1, 2, 3, 4, 5].map(i=> (i <= producto.star_product ? "⭐" : "☆" )).join("") %>
+        </div>
+
 
         <div class="acciones">
           <button class="btn-addcart" data-product-id="<%= producto.id_producto %>">🛒 Añadir al carrito</button>
-          <button class="btn-addcart volver" >Volver a galería</button>
+          <button class="btn-addcart volver">Volver a galería</button>
         </div>
       </div>
     </div>
 
     <!-- 🌍 Mapa de ubicación -->
     <div class="mapa-container">
-      <h3>📍 Ubicación del vendedor: <%= producto.nombre_vendedor %></h3>
-      <div id="map"
-           data-latitud="<%= producto.lat_vendedor %>"
-           data-longitud="<%= producto.lon_vendedor %>"
-           data-nombre="<%= producto.nombre_vendedor %>">
+      <h3>📍 Ubicación del vendedor: <%= producto.nombre_vendedor %>
+      </h3>
+      <div id="map" data-latitud="<%= producto.lat_vendedor %>" data-longitud="<%= producto.lon_vendedor %>"
+        data-nombre="<%= producto.nombre_vendedor %>">
       </div>
     </div>
   </div>
 
   <!-- Leaflet CSS y JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="/js/detail.js"></script>
 </main>

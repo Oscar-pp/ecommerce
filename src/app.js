@@ -515,7 +515,9 @@ app.use((req, res) => {
   res.status(404).render("404", { 
     titulo: "Página no encontrada",
     mensaje: "¡Bienvenido a MyShop!",
-    filecss: "../css/gallery.css",});
+    filecss: "../css/gallery.css",
+    hideNavbar: true,
+    });
 });
 
 // Middleware para manejar errores 500
