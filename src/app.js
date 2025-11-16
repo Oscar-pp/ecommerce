@@ -49,6 +49,7 @@ app.get("/", async (req, res, next) => {
       mensaje: "¡Bienvenido a MyShop!",
       filecss: "../css/gallery.css",
       zonaMain: "body",
+      hideNavbar: false,
     });
   } catch (error) {
     next(error);
@@ -86,6 +87,7 @@ app.get("/detail/:id_producto", async (req, res) => {
       zonaMain: "detail",
       filecss: "/css/detail.css",
       producto,
+      hideNavbar: true,
     });
   } catch (error) {
     console.error("Error al cargar el detalle:", error);
@@ -100,6 +102,7 @@ app.get("/cart", async (req, res) => {
       titulo: `Carrito compras`,
       zonaMain: "cart",
       filecss: "/css/cart.css",
+      hideNavbar: true,
     });
   } catch (error) {
     console.error("Error al cargar el detalle:", error);
@@ -113,6 +116,7 @@ app.get("/checkout", async (req, res) => {
       titulo: `Realizar pago`,
       zonaMain: "checkout",
       filecss: "/css/checkout.css",
+      hideNavbar: true,
     });
   } catch (error) {
     console.error("Error al consultar la base de datos:", error);

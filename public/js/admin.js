@@ -1,16 +1,17 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const id_vendedor = 2;
   const catalogo = document.getElementById("grid-container");
-  // const btnNuevo = document.getElementById("btnNuevo");
   const btnDelete = document.getElementById("btnDelete");
   const btnClean = document.getElementById("btnClean");
   const btnGuardar = document.getElementById("btnGuardar");
   const btnCambiarImagen = document.getElementById("btnCambiarImagen");
   const inputImagen = document.getElementById("imagen");
   const imgPreview = document.getElementById("imagenProducto");
-
   let selectedCard = null;
   let modo = "insert"; // insert | update
+
+  // Inicializa la imagen por defecto al cargar la página
+  imgPreview.src = "/images/imagen_no_disponible.png";
 
   // -----------------------------------------
   // Función para recargar el catálogo de productos
@@ -18,32 +19,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function recargarCatalogo() {
     const res = await fetch(`/api/todosProductos?id_vendedor=${id_vendedor}`);
     const productos = await res.json();
-
     catalogo.innerHTML = ""; // vaciamos el grid
     limpiarFormulario(); // limpiamos formulario y deseleccionamos card
-
     productos.forEach((p) => {
       const card = document.createElement("section");
       card.className = "product-card-admin";
       card.setAttribute("data-id_producto", p.id_producto);
-
       card.innerHTML = `
         <img src="images/${
-          p.imagen_url
+          p.imagen_url || "imagen_no_disponible.png"
         }" loading="lazy" width="110" height="150" class="product-img-admin" />
         <div class="product-info-admin">
           <h2 class="product-title-admin">${p.nombre}</h2>
           <p class="product-price-admin">${p.precio} € — ${
         p.cantidad_disponible
       } Uds.</p>
-          <div class="product-rating-admin"> 
+          <div class="product-rating-admin">
             ${[1, 2, 3, 4, 5]
               .map((i) => (i <= p.star_product ? "⭐" : "☆"))
               .join("")}
           </div>
         </div>
       `;
-
       card.addEventListener("click", () => {
         if (selectedCard === card) {
           card.classList.remove("selected");
@@ -51,15 +48,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           limpiarFormulario();
           return;
         }
-
         if (selectedCard) selectedCard.classList.remove("selected");
         card.classList.add("selected");
         selectedCard = card;
-
         llenarFormulario(p);
         modo = "update";
       });
-
       catalogo.appendChild(card);
     });
   }
@@ -81,10 +75,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("precio").value = p.precio;
     document.getElementById("uds").value = p.cantidad_disponible;
 
-    // Guardamos la imagen original
-    document.getElementById("imagen_actual").value = p.imagen_url;
-
-    imgPreview.src = "images/" + p.imagen_url;
+    // Guardamos la imagen original o usamos la imagen por defecto
+    if (p.imagen_url && p.imagen_url.trim() !== "") {
+      document.getElementById("imagen_actual").value = p.imagen_url;
+      imgPreview.src = "/images/" + p.imagen_url;
+    } else {
+      document.getElementById("imagen_actual").value = "";
+      imgPreview.src = "/images/imagen_no_disponible.png"; // Imagen por defecto
+    }
     inputImagen.style.display = "none"; // se oculta si ya tiene imagen
   }
 
@@ -103,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   btnCambiarImagen.addEventListener("click", () => {
     inputImagen.style.display = "block";
     inputImagen.value = "";
-    imgPreview.src = "";
+    imgPreview.src = "/images/imagen_no_disponible.png"; // Muestra la imagen por defecto al cambiar
   });
 
   // -----------------------------------------
@@ -111,22 +109,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------------------
   function limpiarFormulario() {
     const form = document.getElementById("product-form");
-
     // Guardar el valor de id_vendedor
     const idVendedorValue = document.getElementById("id_vendedor").value;
-
     // Restablecer el formulario
     form.reset();
-
     // Restaurar solo el id_vendedor
     document.getElementById("id_vendedor").value = idVendedorValue;
-
+    // Restauro categoria al que tenga por defecto
+    document.getElementById("categoria").selectedIndex = 0;
     // Limpiar la previsualización de la imagen
-    imgPreview.src = "";
-
+    imgPreview.src = "/images/imagen_no_disponible.png";
     // Mostrar el input de imagen
     inputImagen.style.display = "block";
-
     // Desactivar el producto seleccionado
     if (selectedCard) {
       selectedCard.classList.remove("selected");
@@ -139,10 +133,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------------------
   btnGuardar.addEventListener("click", async () => {
     const formData = new FormData(document.getElementById("product-form"));
-    console.log(" boton guardar tiene estos datos del form :", formData);
     formData.set("id_vendedor", id_vendedor);
     formData.append("modo", modo);
-
     // VALIDACIÓN: campos obligatorios
     const requiredFields = [
       "nombre",
@@ -157,14 +149,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         return; // si falta algún campo, detenemos la función
       }
     }
-
     const res = await fetch("/api/producto/save", {
       method: "POST",
       body: formData,
     });
-
     const data = await res.json();
-
     if (data.error) {
       mostrarMensaje(data.error, "error");
     } else {
@@ -186,7 +175,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     mensajeElement.textContent = mensaje;
     mensajeElement.className = `mensaje ${tipo}`;
     mensajeElement.style.display = "block";
-
     // Oculto el mensaje después de unos segundos
     setTimeout(() => {
       mensajeElement.style.display = "none";
@@ -199,12 +187,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const confirmMessage = document.getElementById("confirmMessage");
     confirmMessage.textContent = mensaje;
     modal.style.display = "block";
-
     document.getElementById("confirmYes").onclick = () => {
       modal.style.display = "none";
       callback(true);
     };
-
     document.getElementById("confirmNo").onclick = () => {
       modal.style.display = "none";
       callback(false);
@@ -220,12 +206,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       mostrarMensaje("Selecciona un producto para eliminar", "error");
       return;
     }
-
     mostrarConfirmacion(
       "¿Estás seguro de que deseas eliminar este producto?",
       async (confirmado) => {
         if (!confirmado) return;
-
         try {
           const res = await fetch("/api/producto/delete", {
             method: "DELETE",
@@ -234,7 +218,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             body: JSON.stringify({ id_producto }),
           });
-
           const data = await res.json();
           if (data.error) {
             mostrarMensaje(data.error, "error");
@@ -249,4 +232,4 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     );
   });
-}); // scope DOM
+});

@@ -64,3 +64,18 @@ select#tipoRuta {
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+
+/* Ocultar navbar */
+.hidden {
+  display: none;
+}
+
+.acciones {
+  display:flex;
+  flex-direction: column;
+}
+
+.volver {
+  color:aqua;
+  margin-top: 5rem;
+}

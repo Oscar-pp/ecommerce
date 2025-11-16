@@ -264,6 +264,11 @@ input.error {
   color: #007a6b;
 }
 
+/* Ocultar navbar */
+.hidden {
+  display: none;
+}
+
 @media (max-width: 700px) {
   .form-group,
   .tarjeta-info {

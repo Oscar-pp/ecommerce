@@ -61,6 +61,7 @@
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
+  height: 600px;
   gap: 18px;
 }
 
@@ -188,26 +189,6 @@
   display: none;
 }
 
-/* .precio-rango {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.precio-rango output {
-  font-weight: 600;
-  color: var(--color-primary);
-  min-width: 40px;
-  text-align: right;
-}
-
-#pi_input {
-  flex: 1;
-  accent-color: var(--color-primary);
-  cursor: pointer;
-} */
-
 /* ============================================================
    🔹 ESTRELLAS
    ============================================================ */
@@ -259,6 +240,7 @@
   justify-content: center;
   gap: 20px;
   min-height: 400px;
+  overflow-y: auto;
 }
 
 /* ============================================================

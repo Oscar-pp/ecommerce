@@ -1,38 +1,97 @@
 /* 
 Gallery.js - Gestión de filtros y visualización de productos
-
-EVENTOS:
-- DOMContentLoaded: Inicialización de componentes y carga inicial de productos
-
-FILTROS:
-1. Botón Toggle: Muestra/oculta panel de filtros en móvil
-2. Buscador: Autocompleta nombres de productos desde la BD
-3. Precio: Validación de rango mín/máx con feedback de error
-4. Estrellas: Sistema de rating con hover y selección/deselección
-5. Categoría: Selector de categoría de productos
-6. Botón Aplicar: Ejecuta filtrado combinado sin recargar página
-7. Funciones para gestionar el carrito de compras (añadir, eliminar, obtener) en localStorage
-
-PRODUCTOS:
-- Carga asíncrona desde API (/api/filtrarValores)
-- Render dinámico de cards con lazy loading de imágenes
-- Interactividad: enlaces a detalle y botón añadir al carrito
-
-ACCESIBILIDAD:
-- Labels asociados con inputs mediante for/id
-- Inputs radio ocultos para navegación por teclado
-- Mensajes de error y estados visuales
 */
 
-import {
-  addToCart,
-  isInCart,
-  updateCartCounter,
-  removeFromCart,
-  getCart,
-} from "./cart.js";
+import { addToCart, isInCart, updateCartCounter } from "./cart.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+/* ---------------------------------------------------------
+   FUNCIÓN PARA RENDERIZAR PRODUCTOS EN LA GALERIA PRINCIPAL
+------------------------------------------------------------*/
+export function renderProductos(productos, container) {
+  container.innerHTML = "";
+
+  if (!productos.length) {
+    container.innerHTML = "<p>No se encontraron productos.</p>";
+    return;
+  }
+
+  productos.forEach((p) => {
+    const card = document.createElement("section");
+    card.className = "product-card";
+    card.innerHTML = `
+      <a href="/detail/${p.id_producto}">
+        <img src="images/${p.imagen_url}" loading="lazy" decoding="async" width="110" height="150" alt="${p.descripcion}" class="product-img" />
+      </a>
+      <div class="product-info">
+        <a href="/detail/${p.id_producto}">
+          <h2 class="product-title">${p.nombre}</h2>
+        </a>
+        <p class="product-price">${p.precio} €</p>
+        <div class="product-rating">
+          ${[1, 2, 3, 4, 5].map(i => (i <= p.star_product ? "⭐" : "☆")).join("")}
+        </div>
+        <button class="btn-add" data-id="${p.id_producto}">Añadir al carrito</button>
+      </div>
+    `;
+    container.appendChild(card);
+
+    const btnAdd = card.querySelector(".btn-add");
+    btnAdd.addEventListener("click", () => {
+      if (isInCart(p.id_producto)) {
+        btnAdd.textContent = "✖ Ya en carrito";
+        btnAdd.style.backgroundColor = "#f24848ff";
+        setTimeout(() => {
+          btnAdd.textContent = "Añadir al carrito";
+          btnAdd.style.backgroundColor = "";
+        }, 1000);
+        return;
+      }
+      addToCart(p);
+      updateCartCounter();
+      btnAdd.textContent = "✓ Añadido";
+      btnAdd.style.backgroundColor = "#4CAF50";
+      setTimeout(() => {
+        btnAdd.textContent = "Añadir al carrito";
+        btnAdd.style.backgroundColor = "";
+      }, 1000);
+    });
+  });
+}
+
+/* ---------------------------------------------------------
+   FUNCIÓN PARA CARGAR PRODUCTOS DESDE LA API
+------------------------------------------------------------*/
+export async function cargarProductos(filtros, container) {
+  const query = new URLSearchParams(filtros).toString();
+  const res = await fetch(`/api/filtrarValores?${query}`);
+  const data = await res.json();
+  renderProductos(data, container);
+}
+
+/* ---------------------------------------------------------
+   FUNCIÓN PARA INICIALIZAR EL NAVBAR (DELEGACIÓN DE EVENTOS)
+------------------------------------------------------------*/
+
+
+export function initNavbar(container) {
+  const navbar = document.querySelector(".navbar");
+  if (!navbar) return;
+
+  navbar.addEventListener("click", async (e) => {
+    if (e.target.tagName === "A") {
+      e.preventDefault();
+      const categoria = e.target.textContent.trim();
+      const res = await fetch(`/api/filtrarValores?categoria=${categoria}`);
+      const productos = await res.json();
+      renderProductos(productos, container);
+    }
+  });
+}
+
+/* ---------------------------------------------------------
+   LÓGICA PRINCIPAL AL CARGAR LA PÁGINA
+------------------------------------------------------------*/
+document.addEventListener("DOMContentLoaded", async () => {
   const toggleBtn = document.querySelector(".toggle-filtros");
   const filtros = document.querySelector(".filtros");
   const inputMin = document.getElementById("precio-min");
@@ -45,12 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const catalogo = document.querySelector(".catalogo");
   const categoria = document.getElementById("option-category");
 
-  // Primera carga del contador del carrito
+  if (!catalogo) return;
+
+  // Contador del carrito
   updateCartCounter();
+  /* -------------------------------
+     INICIALIZAR NAVBAR
+  --------------------------------*/
+  initNavbar(catalogo);
 
-  let currentValue = 0; // Valor actual de estrellas
+  let currentValue = 0;
 
-  // Objeto que guarda todos los filtros activos
   const filtrosActivos = {
     estrellas: 0,
     precioMin: inputMin.value,
@@ -60,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /* -------------------------------
-     TOGGLE CERRAR / MOSTRAR FILTROS
+     TOGGLE FILTROS
   --------------------------------*/
   if (toggleBtn && filtros) {
     toggleBtn.addEventListener("click", () => {
@@ -76,15 +140,13 @@ document.addEventListener("DOMContentLoaded", () => {
   --------------------------------*/
   inputNombre.addEventListener("input", async () => {
     const texto = inputNombre.value.trim();
-    if (texto.length === 0) return;
+    if (!texto) return;
 
-    const response = await fetch(
-      `/api/productos?search=${encodeURIComponent(texto)}`
-    );
+    const response = await fetch(`/api/productos?search=${encodeURIComponent(texto)}`);
     const nombres = await response.json();
     datalist.innerHTML = "";
 
-    nombres.forEach((nombre) => {
+    nombres.forEach(nombre => {
       const option = document.createElement("option");
       option.value = nombre;
       datalist.appendChild(option);
@@ -92,180 +154,67 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* -------------------------------
-     RANGE DE PRECIO
+     VALIDAR RANGO DE PRECIO
   --------------------------------*/
   function validarRango() {
     const min = parseFloat(inputMin.value) || 0;
     const max = parseFloat(inputMax.value) || 0;
 
     if (min > max) {
-      errorMsg.textContent =
-        "⚠️ El precio mínimo no puede ser mayor que el máximo.";
+      errorMsg.textContent = "⚠️ El precio mínimo no puede ser mayor que el máximo.";
       errorMsg.style.display = "block";
       return false;
-    } else {
-      errorMsg.style.display = "none";
-      filtrosActivos.precioMin = min;
-      filtrosActivos.precioMax = max;
-      return true;
     }
+    errorMsg.style.display = "none";
+    filtrosActivos.precioMin = min;
+    filtrosActivos.precioMax = max;
+    return true;
   }
 
-  // Valida solo cuando el usuario termina de editar (blur : pierde el foco),
-  // comprobamos que los rangos son correctos
   inputMin.addEventListener("blur", validarRango);
   inputMax.addEventListener("blur", validarRango);
 
   /* -------------------------------
      STARS FILTRO
   --------------------------------*/
-  stars.forEach((star) => {
+  stars.forEach(star => {
     star.addEventListener("mouseenter", () => {
-      const value = parseInt(star.getAttribute("data-value"));
-      stars.forEach((s) => {
-        if (parseInt(s.getAttribute("data-value")) <= value) {
-          s.classList.add("active");
-        } else {
-          s.classList.remove("active");
-        }
-      });
+      const value = parseInt(star.dataset.value);
+      stars.forEach(s => s.classList.toggle("active", parseInt(s.dataset.value) <= value));
     });
-
     star.addEventListener("mouseleave", () => {
-      stars.forEach((s) => {
-        if (parseInt(s.getAttribute("data-value")) <= currentValue) {
-          s.classList.add("active");
-        } else {
-          s.classList.remove("active");
-        }
-      });
+      stars.forEach(s => s.classList.toggle("active", parseInt(s.dataset.value) <= currentValue));
     });
-
     star.addEventListener("click", () => {
-      const value = parseInt(star.getAttribute("data-value"));
-
+      const value = parseInt(star.dataset.value);
       if (value === currentValue) {
-        // Deseleccionar todo cuando se hace clic en la estrella actual
         currentValue = 0;
         filtrosActivos.estrellas = 0;
-        // Desmarcar todos los inputs radio
-        document.querySelectorAll(".star-input").forEach((input) => {
-          input.checked = false;
-        });
+        document.querySelectorAll(".star-input").forEach(input => input.checked = false);
       } else {
-        // Seleccionar la estrella clickeada
         currentValue = value;
         filtrosActivos.estrellas = value;
-        // Marcar el input radio correspondiente
         const input = document.querySelector(`.star-input[value="${value}"]`);
         if (input) input.checked = true;
       }
-
-      // Actualizar visual de estrellas
-      stars.forEach((s) => {
-        if (parseInt(s.getAttribute("data-value")) <= currentValue) {
-          s.classList.add("active");
-        } else {
-          s.classList.remove("active");
-        }
-      });
+      stars.forEach(s => s.classList.toggle("active", parseInt(s.dataset.value) <= currentValue));
     });
   });
 
-  /* ---------------------------------------------------------
-     FUNCIÓN PARA RENDERIZAR PRODUCTOS EN LA GALERIA PRINCIPAL
-  ------------------------------------------------------------*/
-  function renderProductos(productos) {
-    catalogo.innerHTML = "";
-
-    if (!productos.length) {
-      catalogo.innerHTML = "<p>No se encontraron productos.</p>";
-      return;
-    }
-
-    productos.forEach((p) => {
-      const card = document.createElement("section");
-      card.className = "product-card";
-      card.innerHTML = `
-        <a href="/detail/${p.id_producto}">
-          <img src="images/${
-            p.imagen_url
-          }" loading="lazy" decoding="async" width="110" height="150" alt="${
-        p.descripcion
-      }" class="product-img" />
-        </a>
-        <div class="product-info">
-          <a href="/detail/${p.id_producto}">
-            <h2 class="product-title">${p.nombre}</h2>
-          </a>
-          <p class="product-price">${p.precio} €</p>
-          <div class="product-rating">
-            ${[1, 2, 3, 4, 5]
-              .map((i) => (i <= p.star_product ? "⭐" : "☆"))
-              .join("")}
-          </div>
-          <button class="btn-add" data-id="${
-            p.id_producto
-          }">Añadir al carrito</button>
-        </div>
-      `;
-      catalogo.appendChild(card);
-
-      // Añadir funcionalidad al botón "Añadir al carrito"
-      // Añadir funcionalidad al botón "Añadir al carrito"
-const btnAdd = card.querySelector(".btn-add");
-btnAdd.addEventListener("click", () => {
-  if (isInCart(p.id_producto)) {
-    // Ya existe en el carrito
-    btnAdd.textContent = "✖ Ya en carrito";
-    btnAdd.style.backgroundColor = "#f24848ff";
-    setTimeout(() => {
-      btnAdd.textContent = "Añadir al carrito";
-      btnAdd.style.backgroundColor = "";
-    }, 1000);
-    return;
-  }
-
-  // Añadir el producto completo al carrito
-  addToCart(p);
-
-  // Actualizar contador
-  updateCartCounter();
-
-  // Feedback visual
-  btnAdd.textContent = "✓ Añadido";
-  btnAdd.style.backgroundColor = "#4CAF50";
-  setTimeout(() => {
-    btnAdd.textContent = "Añadir al carrito";
-    btnAdd.style.backgroundColor = "";
-  }, 1000);
-});
-
-    });
-  }
-
   /* -------------------------------
-     FUNCIÓN PARA CARGAR PRODUCTOS
-  --------------------------------*/
-  async function cargarProductos() {
-    const query = new URLSearchParams(filtrosActivos).toString();
-    const res = await fetch(`/api/filtrarValores?${query}`);
-    const data = await res.json();
-    renderProductos(data);
-  }
-
-  /* -------------------------------
-     BOTÓN FILTRAR (sin recargar)
+     BOTÓN FILTRAR
   --------------------------------*/
   btnFiltrar.addEventListener("click", async () => {
-    if (!validarRango()) return; // evita aplicar si los valores del rango estan mal.
+    if (!validarRango()) return;
     filtrosActivos.nombreProducto = inputNombre.value.trim();
     filtrosActivos.categoria = categoria.value;
-    await cargarProductos();
+    await cargarProductos(filtrosActivos, catalogo);
   });
 
+  
+
   /* -------------------------------
-     CARGAR TODOS AL INICIO
+     CARGAR PRODUCTOS INICIALES
   --------------------------------*/
-  cargarProductos();
+  await cargarProductos(filtrosActivos, catalogo);
 });

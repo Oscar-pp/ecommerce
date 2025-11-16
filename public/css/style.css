@@ -36,6 +36,19 @@ main {
   gap: 20px;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Header */
 .header {
   display: flex;
@@ -291,7 +304,7 @@ main {
   color: white;
   text-align: center;
   padding: 15px;
-  margin-top: 30px;
+  margin-top: auto;
 }
 
 /* Responsive tweaks */

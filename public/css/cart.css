@@ -180,10 +180,11 @@
   background: #00a884;
   color: #fff;
   font-weight: 600;
-  padding: 0.7rem 1.5rem;
+  padding: 0.7rem 3rem;
   border-radius: 8px;
   text-decoration: none;
   transition: background 0.3s ease, transform 0.2s ease;
+  margin: 2rem;
 }
 
 .checkout-button:hover {
@@ -196,6 +197,23 @@
   background-color: #000000;
   color: #fd0000;
   cursor: not-allowed;
+}
+
+.checkout-button-volver {
+  display: inline-block;
+  background: #02cba0;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.7rem 3rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin: 2rem;
+}
+
+/* Ocultar navbar */
+.hidden {
+  display: none;
 }
 
 /* ===============================

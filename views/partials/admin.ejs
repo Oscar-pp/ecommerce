@@ -14,8 +14,19 @@
       <label>Descripción</label>
       <textarea id="descripcion" name="descripcion" placeholder="Descripción"></textarea>
 
+      <!-- <label>Categoría</label>
+      <input type="text" id="categoria" name="categoria" placeholder="Categoría"> -->
+
       <label>Categoría</label>
-      <input type="text" id="categoria" name="categoria" placeholder="Categoría">
+      <select id="categoria" name="categoria" class="form-select">
+        <!-- <option value="" disabled >Selecciona una categoría</option> -->
+        <option value="Cultura" selected>Cultura</option>
+        <option value="Ropa">Ropa</option>
+        <option value="Hogar">Hogar</option>
+        <option value="Tecnología">Tecnología</option>
+        <option value="Deporte">Deporte</option>
+        <option value="Otros">Otros</option>
+      </select>
 
       <label>Precio</label>
       <input type="number" id="precio" min="1" value="1" name="precio" placeholder="Precio">
@@ -28,13 +39,16 @@
 
         <div class="form-group">
           <label>Imagen</label>
-
-          <!-- Input oculto cuando hay imagen -->
+          <!-- Input oculto -->
           <input type="file" id="imagen" name="imagen" accept="image/*">
-
-          <img src="" id="imagenProducto" alt="">
-          <button type="button" id="btnCambiarImagen" style="margin-top:8px;">Cambiar imagen</button>
+          <!-- Label personalizado que actúa como botón -->
+          <label for="imagen" class="file-label">Seleccionar archivo</label>
+          <!-- Previsualización -->
+          <img src="" id="imagenProducto" alt="Imagen preview" class="image-preview">
+          <!-- Botón para cambiar imagen -->
+          <button type="button" id="btnCambiarImagen" class="btn btn-change">Cambiar imagen</button>
         </div>
+
       </div>
       <div class="actions">
         <button type="button" id="btnGuardar" class="btn btn-new">
