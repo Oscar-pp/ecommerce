@@ -8,10 +8,33 @@
 
   <div class="container-navbar">
     <ul class="navbar" role="navigation" aria-label="Menú principal">
-      <li><a href="/admin">Mis ventas</a></li>
+      <li><a href="/admin" style="display:none;">Mis ventas</a></li>
       <li><a href="/admin">Ver productos</a></li>
       <li><a href="/">Ir tienda web</a></li>
     </ul>
   </div>
 
+  <div class="login">
+    <button id="logoutBtn">Desloguearse</button>
+  </div>
 </header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (!logoutBtn) return; // por seguridad
+
+    // Mostrar el botón solo si hay un vendedor logueado
+    const vendedor = JSON.parse(localStorage.getItem("vendedor"));
+    if (!vendedor) {
+      logoutBtn.style.display = "none";
+    }
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("vendedor");
+      window.location.href = "/login"; // redirige a login
+    });
+  });
+</script>
+

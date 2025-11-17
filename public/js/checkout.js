@@ -1,303 +1,212 @@
-import {
-  updateCartCounter,
-  addToCart,
-  getCart,
-  isInCart,
-  removeFromCart,
-} from "./cart.js";
+import { getCart } from "./cart.js";
 
-
-// Oculto icono del carrito en la página del carrito
-if (window.location.pathname.includes("/checkout")) {
-  const cart = document.querySelector(".header-actions #cart");
-  if (cart) cart.style.display = "none";
-}
-
-// Función para mostrar/ocultar el GIF de carga
+/* ---------------------------
+   Utilidades y helpers
+--------------------------- */
 function loadingGIF(show) {
-  const loadingOverlay = document.getElementById("loading-overlay");
-  if (show) {
-    loadingOverlay.classList.remove("loading-hidden");
-    loadingOverlay.classList.add("visible");
-  } else {
-    loadingOverlay.classList.remove("visible");
-    loadingOverlay.classList.add("loading-hidden");
-  }
+  const overlay = document.getElementById("loading-overlay");
+  if (!overlay) return;
+  overlay.classList.toggle("visible", show);
+  overlay.classList.toggle("loading-hidden", !show);
 }
 
-// Función de validación genérica de valores y tipos de campo
 function validarCampo(tipo, valor) {
-  valor = valor.trim();
-  const validadores = {
-    string: (v) => v.length > 0,
-    numero: (v) => /^\d+$/.test(v),
-    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-    telefono: (v) => /^\d{9}$/.test(v),
-    cp: (v) => /^\d{5}$/.test(v),
-    password: (v) => v.length >= 6,
-    fecha: (v) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(v), // formato MM/AA
+  valor = String(valor || "").trim();
+  const reglas = {
+    string: v => v.length > 0,
+    numero: v => /^\d+$/.test(v),
+    email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+    telefono: v => /^\d{9}$/.test(v),
+    cp: v => /^\d{5}$/.test(v),
+    password: v => v.length >= 6,
+    fecha: v => /^(0[1-9]|1[0-2])\/\d{2}$/.test(v),
   };
-  if (!validadores[tipo]) {
-    console.warn(`⚠️ Tipo de validación desconocido: "${tipo}"`);
-    return true;
-  }
-  return validadores[tipo](valor);
+  return reglas[tipo] ? reglas[tipo](valor) : true;
 }
 
-// Función para obtener el total a pagar
 function totalPagar() {
-  const total = localStorage.getItem("total_price") || "0.00";
-  return total;
+  return localStorage.getItem("total_price") || "0.00";
 }
 
-function showError(message) {
-  const errorBox = document.querySelector(".error-message");
-  const errorMessage = document.getElementById("error-message-text");
-  errorMessage.textContent = message;
-  errorBox.hidden = false;
+function showError(msg) {
+  const box = document.querySelector(".error-message");
+  if (!box) {
+    alert(msg);
+    return;
+  }
+  const text = document.getElementById("error-message-text");
+  if (text) text.textContent = msg;
+  box.hidden = false;
 }
 
 function hideError() {
-  const errorBox = document.querySelector(".error-message");
-  errorBox.hidden = true;
+  const box = document.querySelector(".error-message");
+  if (box) box.hidden = true;
 }
 
 document.getElementById("close-error")?.addEventListener("click", hideError);
 
+/* ---------------------------
+   DOMContentLoaded - inicialización
+--------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  const btnPagar = document.querySelector(".btn-pagar");
-  // Secciones de pago
   const tarjetaSection = document.querySelector(".tarjeta-info");
   const paypalSection = document.querySelector(".paypal");
   const efectivoSection = document.querySelector(".efectivo-info");
-  const tarjetaInputs = tarjetaSection.querySelectorAll("input");
-  const paypalInputs = paypalSection.querySelectorAll("input");
-  const efectivoInputs = efectivoSection.querySelectorAll("input");
 
-  // Actualiza el total al cargar la página
-  document.getElementById(
-    "totalPriceCheckout"
-  ).textContent = `${totalPagar()} €`;
+  const tarjetaInputs = tarjetaSection ? tarjetaSection.querySelectorAll("input, select, textarea") : [];
+  const paypalInputs = paypalSection ? paypalSection.querySelectorAll("input, select, textarea") : [];
+  const efectivoInputs = efectivoSection ? efectivoSection.querySelectorAll("input, select, textarea") : [];
 
-  // Función para mostrar/ocultar secciones y gestionar required
+  const totalElem = document.getElementById("totalPriceCheckout");
+  if (totalElem) totalElem.textContent = `${totalPagar()} €`;
+
   function togglePaymentSection(metodo) {
-    tarjetaSection.style.display = "none";
-    paypalSection.style.display = "none";
-    efectivoSection.style.display = "none";
+    if (tarjetaSection) tarjetaSection.style.display = "none";
+    if (paypalSection) paypalSection.style.display = "none";
+    if (efectivoSection) efectivoSection.style.display = "none";
 
-    // Quitar required de todos los inputs
-    [...tarjetaInputs, ...paypalInputs, ...efectivoInputs].forEach(
-      (i) => (i.required = false)
-    );
+    [...tarjetaInputs, ...paypalInputs, ...efectivoInputs].forEach(i => i.required = false);
 
-    // Mostrar sección seleccionada y activar required
-    if (metodo === "tarjeta-info") {
+    if (metodo === "tarjeta-info" && tarjetaSection) {
       tarjetaSection.style.display = "grid";
-      tarjetaInputs.forEach((i) => (i.required = true));
-    } else if (metodo === "paypal") {
+      tarjetaInputs.forEach(i => i.required = true);
+    } else if (metodo === "paypal" && paypalSection) {
       paypalSection.style.display = "grid";
-      paypalInputs.forEach((i) => (i.required = true));
-    } else if (metodo === "efectivo-info") {
+      paypalInputs.forEach(i => i.required = true);
+    } else if (metodo === "efectivo-info" && efectivoSection) {
       efectivoSection.style.display = "grid";
+      efectivoInputs.forEach(i => i.required = true);
     }
   }
 
-  // Manejo de cambio en los radios
-  document.querySelectorAll('input[name="pago"]').forEach((radio) => {
-    radio.addEventListener("change", (e) =>
-      togglePaymentSection(e.target.value)
-    );
+  document.querySelectorAll('input[name="pago"]').forEach(radio => {
+    radio.addEventListener("change", e => togglePaymentSection(e.target.value));
   });
 
-  // Inicializar la sección según el radio seleccionado al cargar
-  togglePaymentSection(
-    document.querySelector('input[name="pago"]:checked').value
-  );
+  const checkedRadio = document.querySelector('input[name="pago"]:checked');
+  togglePaymentSection(checkedRadio ? checkedRadio.value : null);
 
-  // Clic en "Realizar pago"
-  btnPagar.addEventListener("click", (e) => {
-    e.preventDefault();
-    hideError(); // Ocultar errores previos
+  const btnPagar = document.querySelector(".btn-pagar");
+  if (btnPagar) btnPagar.addEventListener("click", procesarCheckout);
+});
 
-    // Validar todos los campos visibles
-    const data = {};
-    let hasError = false;
+/* ---------------------------
+   Flujo principal: registro usuario + pedido
+--------------------------- */
+async function procesarCheckout(e) {
+  e.preventDefault();
+  hideError();
 
-    document.querySelectorAll("[data-field]").forEach((input) => {
-      if (input.offsetParent === null) return; // Saltar campos ocultos
-      const key = input.dataset.field;
-      const value = input.value.trim();
-      const tipo = input.dataset.type || "string";
+  const data = {};
+  let hasError = false;
 
-      if (!validarCampo(tipo, value)) {
-        hasError = true;
-        input.classList.add("error");
-      } else {
-        input.classList.remove("error");
-        data[key] = value;
-      }
-    });
+  document.querySelectorAll("[data-field]").forEach(input => {
+    if (input.offsetParent === null) return;
+    const key = input.dataset.field;
+    const tipo = input.dataset.type || "string";
+    const value = (input.value || "").trim();
 
-    if (hasError) {
-      showError(
-        "Por favor, completa todos los campos obligatorios correctamente."
-      );
-      return; // Detener el flujo si hay errores
+    if (!validarCampo(tipo, value)) {
+      hasError = true;
+      input.classList.add("error");
+    } else {
+      input.classList.remove("error");
+      data[key] = value;
     }
+  });
 
-    // Si no hay errores, mostrar spinner y procesar
-    loadingGIF(true);
+  if (hasError) {
+    showError("Por favor, completa todos los campos obligatorios correctamente.");
+    return;
+  }
 
-    // Enviar datos a procesar al backend
-    // GUARDAR PEDIDO, USUARIO, PEDIDOS_PRODUCTOS, RESTAR STOCK PRODUCTO, ...
-    // Orden lógico de inserts:
-    // usuarios;
-    // pedidos;
-    // pedidos_productos;
-    // valoraciones; Pendiente!!!!....................
+  loadingGIF(true);
 
+  try {
+    // 1) Registrar o reutilizar usuario
+    const id_usuario = await registrarUsuario(data);
 
+    // 2) Registrar pedido
+    const pedidoRes = await registrarPedido(id_usuario);
 
-    // Simular procesamiento 
-    setTimeout(() => {
-      loadingGIF(false); // Ocultar spinner
-      console.log("Datos válidos:", data);
-
-      // Limpiar carrito y mostrar confirmación
+    if (pedidoRes && pedidoRes.success) {
       localStorage.removeItem("cart_items");
       localStorage.removeItem("total_price");
 
-      // Mostrar mensaje de confirmación
-      const mensajeConfirmacion = document.getElementById(
-        "mensaje-confirmacion"
-      );
-      mensajeConfirmacion.classList.remove("confirmacion-oculta");
-      mensajeConfirmacion.classList.add("visible");
-    }, 3000); // Simular 3 segundos de procesamiento
-  });
-});
-
-
-// INSERTS USUARIO
-async function registrarUsuario(event) {
-  event.preventDefault();
-  const formData = {
-    nombre: document.getElementById("nombre").value,
-    apellidos: document.getElementById("apellidos").value,
-    email: document.getElementById("email").value,
-    contrasenya: document.getElementById("contrasenya").value,
-    telefono: document.getElementById("telefono").value,
-    direccion: document.getElementById("direccion").value,
-    cp: document.getElementById("cp").value,
-  };
-
-  // Validar campos obligatorios
-  if (!formData.nombre || !formData.apellidos || !formData.email || !formData.contrasenya) {
-    showError("Por favor, completa todos los campos obligatorios.");
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/usuarios", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      if (response.status === 401) {
-        showError(errorData.error || "Contraseña incorrecta.");
-      } else {
-        throw new Error(`Error al procesar el usuario: ${response.statusText}`);
+      const mensajeConfirmacion = document.getElementById("mensaje-confirmacion");
+      if (mensajeConfirmacion) {
+        mensajeConfirmacion.classList.remove("confirmacion-oculta");
+        mensajeConfirmacion.classList.add("visible");
       }
-      return;
+    } else {
+      throw new Error(pedidoRes?.error || "Error procesando el pedido");
     }
-
-    const { id_usuario } = await response.json();
-    // Guardar el ID del usuario en localStorage
-    localStorage.setItem("id_usuario", id_usuario);
-
-    // Continuar con el registro del pedido
-    await registrarPedido();
-  } catch (error) {
-    console.error("Error:", error);
-    showError("Hubo un error al procesar el usuario. Inténtalo de nuevo.");
+  } catch (err) {
+    console.error("Error checkout:", err);
+    showError(err.message || "Error al procesar el pedido.");
+  } finally {
+    loadingGIF(false);
   }
 }
 
-// INSERT PEDIDOS
-async function registrarPedido() {
-  // Obtener el ID del usuario de localStorage
-  const id_usuario = localStorage.getItem("id_usuario");
-  if (!id_usuario) {
-    showError("Debes iniciar sesión para realizar un pedido.");
-    return;
-  }
-
-  // Obtener el total del carrito
-  const total = parseFloat(localStorage.getItem("total_price")) || 0;
-  if (total <= 0) {
-    showError("El total del pedido no es válido.");
-    return;
-  }
-
-  // Obtener los productos del carrito con sus cantidades y precios
-  const productos = getCart();
-  if (productos.length === 0) {
-    showError("No hay productos en el carrito.");
-    return;
-  }
-
-  // Preparar los datos para el backend
-  const pedidoData = {
-    id_usuario: parseInt(id_usuario),
-    total,
-    productos: productos.map((producto) => ({
-      id_producto: producto.id_producto,
-      cantidad: producto.cantidad,
-      precio_unitario: producto.precio,
-    })),
+/* ---------------------------
+   API: registrar usuario
+--------------------------- */
+async function registrarUsuario(formData) {
+  const payload = {
+    nombre: formData.nombre || "",
+    apellidos: formData.apellidos || "",
+    email: formData.email || "",
+    contrasenya: formData.contrasenya || "",
+    telefono: formData.telefono || "",
+    direccion: formData.direccion || "",
+    cp: formData.cp || ""
   };
 
-  console.log("Datos del pedido:", pedidoData); // Verificar los datos antes de enviarlos
+  const res = await fetch("/api/usuarios", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-  try {
-    const response = await fetch("/api/pedidos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(pedidoData),
-    });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || "Error registrando usuario");
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Error al registrar el pedido: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    console.log("Pedido registrado:", result);
-
-    // Limpiar el carrito y mostrar mensaje de éxito
-    localStorage.removeItem("cart_items");
-    localStorage.removeItem("total_price");
-    alert("Pedido registrado correctamente.");
-  } catch (error) {
-    console.error("Error:", error);
-    showError(error.message || "Hubo un error al registrar el pedido. Inténtalo de nuevo.");
-  }
+  return json.id_usuario;
 }
 
+/* ---------------------------
+   API: registrar pedido
+--------------------------- */
+async function registrarPedido(id_usuario) {
+  const carrito = getCart();
+  if (!Array.isArray(carrito) || carrito.length === 0) {
+    throw new Error("El carrito está vacío.");
+  }
 
+  const productos = carrito.map(p => ({
+    id_producto: p.id_producto,
+    cantidad: p.cantidad,
+    precio_unitario: p.precio
+  }));
 
+  const total = parseFloat(localStorage.getItem("total_price") || 0);
 
+  const payload = {
+    id_usuario: parseInt(id_usuario, 10),
+    total,
+    productos
+  };
 
+  const res = await fetch("/api/pedidos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || "Error registrando pedido");
 
-
-// Disparadores click al crear el checkout
-document.querySelector(".btn-pagar").addEventListener("click", registrarUsuario);
-
+  return json; // { success: true, id_pedido }
+}

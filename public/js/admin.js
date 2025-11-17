@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const id_vendedor = 2;
+  // Recuperar el objeto vendedor del localStorage
+  const vendedor = JSON.parse(localStorage.getItem("vendedor"));
+
+  if (!vendedor) {
+    console.error("No hay vendedor en localStorage");
+    return;
+  }
+
+  const id_vendedor = vendedor.id_vendedor;
+  console.log("ID del vendedor:", id_vendedor);
+
   const catalogo = document.getElementById("grid-container");
   const btnDelete = document.getElementById("btnDelete");
   const btnClean = document.getElementById("btnClean");

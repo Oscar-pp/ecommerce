@@ -148,9 +148,134 @@ app.get("/admin", async (req, res) => {
   }
 });
 
+app.get("/login", async (req, res) => {
+  try {
+    res.render("login", {
+      titulo: `Login`,
+      filecss: "/css/login.css",
+    });
+  } catch (error) {
+    console.error("Error al consultar la base de datos:", error);
+    res.status(500).send("Error al cargar login");
+  }
+});
+
+app.get("/register", async (req, res) => {
+  try {
+    res.render("register", {
+      titulo: "Register",
+      filecss: "/css/register.css",
+    });
+  } catch (error) {
+    console.error("Error al consultar la base de datos:", error);
+    res.status(500).send("Error al cargar register");
+  }
+});
+
 /*
     API 
 */
+
+app.post("/api/register", async (req, res) => {
+  const { nombre_tienda, password, direccion, descripcion } = req.body;
+
+  try {
+    if (!nombre_tienda || !password || !direccion || !descripcion) {
+      return res.render("register", {
+        error: "Todos los campos son obligatorios",
+        nombre_tienda,
+        direccion,
+        descripcion,
+      });
+    }
+
+    const [tienda] = await pool.query(
+      "SELECT id_vendedor FROM vendedores WHERE nombre_tienda = ?",
+      [nombre_tienda]
+    );
+
+    if (tienda.length > 0) {
+      return res.render("register", {
+        error: "El nombre de tienda ya está registrado. Elige otro.",
+        nombre_tienda,
+        direccion,
+        descripcion,
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `INSERT INTO vendedores (nombre_tienda, password, direccion_tienda, descripcion)
+       VALUES (?, ?, ?, ?)`,
+      [nombre_tienda, hashedPassword, direccion, descripcion]
+    );
+
+    res.redirect("/api/login");
+  } catch (err) {
+    console.error("Error en registro de vendedor:", err);
+    res.render("register", {
+      error: "Error interno del servidor. Inténtalo de nuevo.",
+      nombre_tienda,
+      direccion,
+      descripcion,
+    });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  const { nombreEmpresa, password } = req.body;
+
+  // Validación de campos obligatorios
+  if (!nombreEmpresa || !password) {
+    return res.render("login", {
+      titulo: "Login",
+      filecss: "/css/login.css",
+      error: "Todos los campos son obligatorios"
+    });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT id_vendedor, password FROM vendedores WHERE nombre_tienda = ?",
+      [nombreEmpresa]
+    );
+
+    if (rows.length === 0) {
+      return res.render("login", {
+        titulo: "Login",
+        filecss: "/css/login.css",
+        error: "Vendedor no encontrado"
+      });
+    }
+
+    const vendedor = rows[0];
+    const passwordMatch = await bcrypt.compare(password, vendedor.password);
+
+    if (!passwordMatch) {
+      return res.render("login", {
+        titulo: "Login",
+        filecss: "/css/login.css",
+        error: "Contraseña incorrecta"
+      });
+    }
+
+    // Login correcto → render de redirección
+    res.render("login-success", {
+      vendedorId: vendedor.id_vendedor,
+      nombreEmpresa
+    });
+
+  } catch (err) {
+    console.error("Error en login:", err);
+    res.render("login", {
+      titulo: "Login",
+      filecss: "/css/login.css",
+      error: "Error interno del servidor. Inténtalo de nuevo."
+    });
+  }
+});
+
 
 app.get("/api/productos", async (req, res) => {
   try {
@@ -213,11 +338,14 @@ app.get("/api/allProductos", async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
- 
+
 app.get("/api/todosProductos", async (req, res) => {
-  const id_vendedor = req.query.id_vendedor; 
+  const id_vendedor = req.query.id_vendedor;
   try {
-    const [productos] = await pool.query(`SELECT * FROM productos WHERE id_vendedor = ?`, id_vendedor);
+    const [productos] = await pool.query(
+      `SELECT * FROM productos WHERE id_vendedor = ?`,
+      id_vendedor
+    );
     res.json(productos);
   } catch (error) {
     console.error(error);
@@ -274,6 +402,50 @@ app.get("/api/productos/:id", async (req, res) => {
   }
 });
 
+app.post("/api/pedido", async (req, res) => {
+  const { usuarioId, carrito, total, datos } = req.body;
+
+  if (!usuarioId || !Array.isArray(carrito) || carrito.length === 0) {
+    return res.json({ success: false, message: "Datos incompletos para procesar el pedido." });
+  }
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    // Insertar pedido
+    const [pedidoResult] = await conn.query(
+      "INSERT INTO pedidos (id_usuario, total, fecha) VALUES (?, ?, NOW())",
+      [usuarioId, total]
+    );
+    const pedidoId = pedidoResult.insertId;
+
+    // Insertar productos del pedido y actualizar stock
+    for (const item of carrito) {
+      // Insertar en pedidos_productos
+      await conn.query(
+        "INSERT INTO pedidos_productos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)",
+        [pedidoId, item.id, item.cantidad, item.precio]
+      );
+
+      // Restar stock
+      await conn.query(
+        "UPDATE productos SET stock = stock - ? WHERE id_producto = ?",
+        [item.cantidad, item.id]
+      );
+    }
+
+    await conn.commit();
+    res.json({ success: true, pedidoId });
+  } catch (err) {
+    await conn.rollback();
+    console.error("Error procesando pedido:", err);
+    res.json({ success: false, message: "Error interno del servidor al procesar el pedido." });
+  } finally {
+    conn.release();
+  }
+});
+
 // -------------------------------
 // INSERT / UPDATE PRODUCTO ADMIN
 // -------------------------------
@@ -288,10 +460,10 @@ app.post("/api/producto/save", upload.single("imagen"), async (req, res) => {
       categoria,
       precio,
       uds,
-      imagen_actual
+      imagen_actual,
     } = req.body;
-console.log(req.body);
-console.log(req.file);
+    console.log(req.body);
+    console.log(req.file);
     // Validar que los valores numéricos sean correctos
     const idProd = id_producto ? Number(id_producto) : 0;
     // const idVendedor = Number(id_vendedor);
@@ -300,8 +472,14 @@ console.log(req.file);
 
     // Validar que los valores numéricos no sean NaN
     if (isNaN(id_vendedor) || isNaN(cantidad) || isNaN(precioNum)) {
-      console.error("Valores numéricos inválidos:", { id_vendedor, cantidad, precioNum });
-      return res.status(400).json({ error: "Los valores numéricos no son válidos." });
+      console.error("Valores numéricos inválidos:", {
+        id_vendedor,
+        cantidad,
+        precioNum,
+      });
+      return res
+        .status(400)
+        .json({ error: "Los valores numéricos no son válidos." });
     }
 
     // Determinar imagen a usar
@@ -315,7 +493,7 @@ console.log(req.file);
         (id_vendedor, nombre, descripcion, categoria, precio, cantidad_disponible, imagen_url)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
-      console.log("id del vendedor es : " , id_vendedor);
+      console.log("id del vendedor es : ", id_vendedor);
       await pool.query(sql, [
         id_vendedor,
         nombre,
@@ -323,9 +501,12 @@ console.log(req.file);
         categoria,
         precioNum,
         cantidad,
-        imagen
+        imagen,
       ]);
-      return res.json({ message: "Producto insertado correctamente" , tipo: "success"});
+      return res.json({
+        message: "Producto insertado correctamente",
+        tipo: "success",
+      });
     }
 
     if (modo === "update" && idProd > 0) {
@@ -342,7 +523,7 @@ console.log(req.file);
         precioNum,
         cantidad,
         imagen,
-        idProd
+        idProd,
       ]);
       return res.json({ message: "Producto actualizado correctamente" });
     }
@@ -359,11 +540,15 @@ app.delete("/api/producto/delete", async (req, res) => {
     const { id_producto } = req.body;
 
     if (!id_producto) {
-      return res.status(400).json({ error: "ID de producto no proporcionado." });
+      return res
+        .status(400)
+        .json({ error: "ID de producto no proporcionado." });
     }
 
     // Eliminar el producto
-    await pool.query("DELETE FROM productos WHERE id_producto = ?", [id_producto]);
+    await pool.query("DELETE FROM productos WHERE id_producto = ?", [
+      id_producto,
+    ]);
 
     res.json({ message: "Producto eliminado correctamente" });
   } catch (error) {
@@ -372,138 +557,81 @@ app.delete("/api/producto/delete", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
 /* -----------------------------------------------------
   INSERT UPDATE DE USUARIO Y AÑADIR A PEDIDOS REALIZADOS
   ------------------------------------------------------*/
 // Endpoint para registrar un usuario
 app.post("/api/usuarios", async (req, res) => {
   const { nombre, apellidos, email, contrasenya, telefono, direccion, cp } = req.body;
-
+console.log(req.body);
+console.log(nombre, apellidos, email, contrasenya);
   try {
-    // Verificar si el email ya existe
-    const [existingUsers] = await pool.query(
-      "SELECT id_usuario, contraseña FROM usuarios WHERE email = ?",
+    // ¿El email ya existe?
+    const [rows] = await pool.query(
+      "SELECT id_usuario FROM usuarios WHERE email = ?",
       [email]
     );
 
-    let id_usuario;
-
-    if (existingUsers.length > 0) {
-      // El usuario ya existe, validar la contraseña
-      const user = existingUsers[0];
-      const isPasswordValid = await bcrypt.compare(contrasenya, user.contraseña);
-
-      if (!isPasswordValid) {
-        return res.status(401).json({ error: "Contraseña incorrecta." });
-      }
-
-      // Si la contraseña es válida, usar el ID del usuario existente
-      id_usuario = user.id_usuario;
-    } else {
-      // El usuario no existe, registrarlo
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(contrasenya, saltRounds);
-
-      const [result] = await pool.query(
-        "INSERT INTO usuarios (nombre, apellidos, email, contraseña, telefono, direccion, cp) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [nombre, apellidos, email, hashedPassword, telefono, direccion, cp]
-      );
-
-      id_usuario = result.insertId;
+    // Si existe → devolver id_usuario
+    if (rows.length > 0) {
+      return res.json({ id_usuario: rows[0].id_usuario });
     }
 
-    // Devolver el ID del usuario (existente o recién registrado)
-    res.status(200).json({ id_usuario });
-  } catch (error) {
-    console.error("Error al manejar el usuario:", error);
-    res.status(500).json({ error: "Error al procesar el usuario." });
+    // Si no existe → crear usuario
+    const [result] = await pool.query(
+      `INSERT INTO usuarios (nombre, apellidos, email, contrasenya, telefono, direccion, cp)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [nombre, apellidos, email, contrasenya, telefono, direccion, cp]
+    );
+
+    res.json({ id_usuario: result.insertId });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al registrar usuario." });
   }
 });
+
 
 // Endpoint para registrar un pedido
 app.post("/api/pedidos", async (req, res) => {
-  // 1. Obtener los datos del cuerpo de la solicitud
   const { id_usuario, total, productos } = req.body;
 
-  // 2. Validar que los datos requeridos estén presentes
-  if (!id_usuario || !total || !productos || !Array.isArray(productos)) {
-    return res.status(400).json({
-      error: "Faltan datos requeridos o el formato de los productos es inválido."
-    });
+  if (!id_usuario || !productos || productos.length === 0) {
+    return res.status(400).json({ error: "Datos incompletos." });
   }
 
-  // 3. Validar que el array de productos no esté vacío
-  if (productos.length === 0) {
-    return res.status(400).json({
-      error: "No se pueden registrar pedidos sin productos."
-    });
-  }
-
-  // 4. Obtener una conexión del pool y comenzar una transacción
-  const connection = await pool.getConnection();
   try {
-    await connection.beginTransaction();
-
-    // 5. Insertar el pedido en la tabla `pedidos`
-    const [pedidoResult] = await connection.query(
-      "INSERT INTO pedidos (id_usuario, total, estado) VALUES (?, ?, 'pendiente')",
+    // Crear pedido
+    const [pedido] = await pool.query(
+      "INSERT INTO pedidos (id_usuario, total, fecha_pedido) VALUES (?, ?, NOW())",
       [id_usuario, total]
     );
-    const id_pedido = pedidoResult.insertId;
 
-    // 6. Insertar cada producto en la tabla `pedidos_productos`
-    for (const producto of productos) {
-      const { id_producto, cantidad, precio_unitario } = producto;
+    const id_pedido = pedido.insertId;
 
-      // Validar que los datos del producto estén completos
-      if (!id_producto || !cantidad || !precio_unitario) {
-        await connection.rollback();
-        return res.status(400).json({
-          error: `Datos incompletos para el producto con ID ${id_producto}.`
-        });
-      }
-
-      // Insertar el producto en `pedidos_productos`
-      await connection.query(
+    // Insertar productos y restar stock
+    for (const p of productos) {
+      // Insertar producto del pedido
+      await pool.query(
         "INSERT INTO pedidos_productos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)",
-        [id_pedido, id_producto, cantidad, precio_unitario]
+        [id_pedido, p.id_producto, p.cantidad, p.precio_unitario]
+      );
+
+      // Restar stock
+      await pool.query(
+        "UPDATE productos SET cantidad_disponible = cantidad_disponible - ? WHERE id_producto = ?",
+        [p.cantidad, p.id_producto]
       );
     }
 
-    // 7. Confirmar la transacción si todo salió bien
-    await connection.commit();
-    res.status(201).json({
-      id_pedido,
-      message: "Pedido registrado correctamente."
-    });
-  } catch (error) {
-    // 8. Revertir la transacción si ocurre un error
-    await connection.rollback();
-    console.error("Error al registrar el pedido:", error);
-    res.status(500).json({
-      error: "Ocurrió un error al registrar el pedido. Inténtalo de nuevo."
-    });
-  } finally {
-    // 9. Liberar la conexión de vuelta al pool
-    connection.release();
+    res.json({ success: true, id_pedido });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error registrando pedido." });
   }
 });
-
-
-
-
-
 
 
 /* 
@@ -512,12 +640,12 @@ app.post("/api/pedidos", async (req, res) => {
 
 // Middleware para manejar errores 404
 app.use((req, res) => {
-  res.status(404).render("404", { 
+  res.status(404).render("404", {
     titulo: "Página no encontrada",
     mensaje: "¡Bienvenido a MyShop!",
     filecss: "../css/gallery.css",
     hideNavbar: true,
-    });
+  });
 });
 
 // Middleware para manejar errores 500

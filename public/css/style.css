@@ -332,6 +332,32 @@ main {
   }
 }
 
+/* ==== BOTONES LOGIN / LOGOUT ==== */
+#loginBtn,
+#logoutBtn {
+  padding: 6px 14px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+#loginBtn:hover,
+#logoutBtn:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.header-actions #loginBtn,
+.header-actions #logoutBtn {
+  margin-left: 10px;
+}
+
+
 @media (max-width: 600px) {
   .container-navbar {
     display: none;

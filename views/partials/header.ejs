@@ -19,25 +19,42 @@
 
   <div class="header-actions">
     <div class="cart" id="cart">
-      <!-- Botón del carrito -->
       <button id="cartButton" aria-expanded="false" aria-controls="cartDropdown">
         🛒 <span id="cartCount">0</span>
       </button>
 
-      <!-- Dropdown del carrito -->
-      <div
-        class="cart-dropdown"
-        id="cartDropdown"
-        role="menu"
-        aria-label="Contenido del carrito"
-      >
-        <ul class="cart-items">
-          <!-- Tarjetas dinámicamente -->
-        </ul>
+      <div class="cart-dropdown" id="cartDropdown" role="menu" aria-label="Contenido del carrito">
+        <ul class="cart-items"></ul>
         <div class="cart-actions">
           <a href="/cart" id="goToCartBtn" class="btn btn-primary">Ver carrito</a>
         </div>
       </div>
     </div>
+
+    <div class="login">
+      <button id="loginBtn">Login</button>
+    </div>
   </div>
 </header>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.getElementById("loginBtn");
+  if (!loginBtn) return;
+
+  const vendedor = JSON.parse(localStorage.getItem("vendedor"));
+
+  // Si ya está logueado, ocultamos login
+  if (vendedor) {
+    loginBtn.style.display = "none";
+  } else {
+    loginBtn.style.display = "inline-block"; // aseguramos que se vea si no hay vendedor
+  }
+
+  loginBtn.addEventListener("click", () => {
+    window.location.href = "/login";
+  });
+});
+
+</script>
+

@@ -11,6 +11,7 @@
         type="text"
         id="nombre"
         data-field="nombre"
+        data-type="string"
         placeholder="Juan"
         required
       />
@@ -20,6 +21,7 @@
         type="text"
         id="apellidos"
         data-field="apellidos"
+        data-type="string"
         placeholder="Pérez Fernández"
         required
       />
@@ -29,8 +31,8 @@
         type="tel"
         id="telefono"
         data-field="telefono"
+        data-type="telefono"
         placeholder="666111333"
-        pattern="[0-9]{9}"
       />
     </fieldset>
 
@@ -43,6 +45,7 @@
         type="text"
         id="direccion"
         data-field="direccion"
+        data-type="string"
         placeholder="Calle Ejemplo 123"
         required
       />
@@ -52,6 +55,7 @@
         type="text"
         id="ciudad"
         data-field="ciudad"
+        data-type="string"
         placeholder="Madrid"
         required
       />
@@ -61,6 +65,7 @@
         type="text"
         id="cp"
         data-field="cp"
+        data-type="cp"
         placeholder="28001"
         required
         pattern="\d{5}"
@@ -76,6 +81,7 @@
         type="email"
         id="email"
         data-field="email"
+        data-type="email"
         placeholder="ejemplo@email.com"
         required
       />
@@ -85,6 +91,7 @@
         type="password"
         id="contrasenya"
         data-field="contrasenya"
+        data-type="password"
         placeholder="Contraseña"
         required
       />
@@ -95,15 +102,18 @@
       <legend>Método de pago</legend>
 
       <div class="metodos-pago">
-        <label
-          ><input type="radio" name="pago" value="tarjeta-info" checked />
-          Tarjeta de crédito</label
-        >
-        <label><input type="radio" name="pago" value="paypal" /> PayPal</label>
-        <label
-          ><input type="radio" name="pago" value="efectivo-info" />Efectivo en
-          tienda</label
-        >
+        <label>
+          <input type="radio" name="pago" value="tarjeta-info" checked />
+          Tarjeta de crédito
+        </label>
+        <label>
+          <input type="radio" name="pago" value="paypal" />
+          PayPal
+        </label>
+        <label>
+          <input type="radio" name="pago" value="efectivo-info" />
+          Efectivo en tienda
+        </label>
       </div>
 
       <div class="tarjeta-info">
@@ -112,6 +122,7 @@
           type="text"
           id="tarjeta-numero"
           data-field="tarjeta_numero"
+          data-type="numero"
           placeholder="1234 5678 9012 3456"
         />
 
@@ -120,6 +131,7 @@
           type="text"
           id="tarjeta-fecha"
           data-field="tarjeta_fecha"
+          data-type="fecha"
           placeholder="MM/AA"
         />
 
@@ -128,13 +140,19 @@
           type="text"
           id="tarjeta-cvv"
           data-field="tarjeta_cvv"
+          data-type="numero"
           placeholder="123"
         />
       </div>
 
       <div class="paypal">
         <label for="paypal-email">Email de PayPal</label>
-        <input type="text" id="paypal-email" data-field="paypal-email" />
+        <input
+          type="text"
+          id="paypal-email"
+          data-field="paypal_email"
+          data-type="email"
+        />
       </div>
 
       <div class="efectivo-info">
@@ -153,22 +171,17 @@
   <div id="mensaje-confirmacion" class="confirmacion-oculta">
     <div class="confirmacion-content">
       <h3>✅ Operación realizada correctamente</h3>
-      <p>
-        Gracias por tu compra.
-      </p>
-      <p> 
-        Recibirás un correo con los detalles de tu
-        pedido.
-      </p>
+      <p>Gracias por tu compra.</p>
+      <p>Recibirás un correo con los detalles de tu pedido.</p>
       <a href="/" class="btn-volver">Volver al catálogo</a>
     </div>
   </div>
 
- <div class="error-message" hidden>
-  <span id="error-message-text"></span>
-  <button id="close-error" class="close-error-btn">X</button>
-</div>
-
+  <!-- Mensaje de error -->
+  <div class="error-message" hidden>
+    <span id="error-message-text"></span>
+    <button id="close-error" class="close-error-btn">X</button>
+  </div>
 
   <!-- Procesando pago -->
   <div id="loading-overlay" class="loading-hidden">

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirigiendo...</title>
+</head>
+<body>
+  <script>
+    // Guardamos el vendedor en localStorage
+    localStorage.setItem("vendedor", JSON.stringify({
+      id_vendedor: "<%= vendedorId %>",
+      nombre: "<%= nombreEmpresa %>"
+    }));
+
+    // Redirigimos al dashboard
+    window.location.href = "/admin";
+  </script>
+</body>
+</html>

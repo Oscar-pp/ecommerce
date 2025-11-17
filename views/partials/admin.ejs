@@ -1,3 +1,12 @@
+<!-- <script>
+  const vendedor = JSON.parse(localStorage.getItem("vendedor"));
+  if (!vendedor) {
+    window.location.href = "/api/login";
+  } else {
+    console.log("Vendedor logueado:", vendedor.nombre);
+  }
+</script> -->
+
 <div class="product-container">
   <!-- FORMULARIO PRODUCTO -->
   <section class="product-form">
@@ -64,6 +73,15 @@
 
     </form>
   </section>
+
+  <!-- <button id="logout">Cerrar sesión</button>
+<script>
+  document.getElementById("logout").addEventListener("click", () => {
+    localStorage.removeItem("vendedor");
+    window.location.href = "/api/login";
+  });
+</script> -->
+
 
   <!-- LISTADO DE PRODUCTOS -->
   <section class="product-list">
